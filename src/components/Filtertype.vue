@@ -12,42 +12,56 @@
       </el-col>
     </el-row>
     <div style="margin: 15px 0"></div>
-    <el-checkbox-group  
-      v-model="checkedSensors"
-      @change="handleCheckedSensorsChange"
+    <el-checkbox-group
+      v-model="checkedTypes"
+      @change="handleCheckedTypesChange"
     >
-      
-        <el-checkbox class="el-checkbox-width" v-for="sensor in sensors" :label="sensor" :key="sensor">
-          
-          <div id="sensor-block">{{ sensor }}</div>
-        </el-checkbox>
-      
+      <el-checkbox
+        class="el-checkbox-width"
+        v-for="type in Types"
+        :label="type"
+        :key="type"
+      >
+        <img :src="type.imgSrc" class="icon-image"/>
+        <span id="sensor-block"> {{type.name}} </span>
+        
+      </el-checkbox>
     </el-checkbox-group>
   </div>
 </template>
 
 <script>
-const SensorOptions = ["Landslide", "Earthquake", "Oil spill", "Flood","Volcanic eruption","Fire","Cyclone","Ocean wave","Snow","Other",];
+const TypeOptions  = [
+  {imgSrc:require('../assets/earthquake.png'),name:"Earthquake"},
+  {imgSrc:require('../assets/forestfire.png'),name:"Fire"},
+  {imgSrc:require('../assets/crumble.png'),name:"Crumble"},
+  {imgSrc:require('../assets/pest.png'),name:"Pest"},
+  {imgSrc:require('../assets/rainstorm.png'),name:"Rainstorm"},
+  {imgSrc:require('../assets/typhoon.png'),name:"Typhoon"},
+  {imgSrc:require('../assets/vocano.png'),name:"Volcanic eruption"},
+  {imgSrc:'',name:"other"},
+
+];
 export default {
   name: "filterModel",
   data() {
     return {
       checkAll: false,
-      checkedSensors: [],
-      sensors: SensorOptions,
+      checkedTypes: [],
+      Types: TypeOptions ,
       isIndeterminate: true,
     };
   },
   methods: {
     handleCheckAllChange(val) {
-      this.checkedSensors = val ? SensorOptions : [];
+      this.checkedTypes = val ? TypeOptions  : [];
       this.isIndeterminate = false;
     },
-    handleCheckedSensorsChange(value) {
+    handleCheckedTypesChange(value) {
       let checkedCount = value.length;
-      this.checkAll = checkedCount === this.sensors.length;
+      this.checkAll = checkedCount === this.Type.length;
       this.isIndeterminate =
-        checkedCount > 0 && checkedCount < this.sensors.length;
+        checkedCount > 0 && checkedCount < this.Type.length;
     },
   },
 };
@@ -57,11 +71,16 @@ export default {
 .sensor-block {
   text-align: start;
 }
-.el-checkbox-width{
+.el-checkbox-width {
   width: 140px;
-  height: 25px;
-  float: left;
+  
+  text-align: left;
 
+  
+  
 }
-
+.icon-image{
+  height:25px;
+  width:25px;
+}
 </style>

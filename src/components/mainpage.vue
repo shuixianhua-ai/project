@@ -9,6 +9,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import mapUrl from "../util/mapUrl";
+import axios from "axios";
 
 export default {
   name: "mainmap",
@@ -131,12 +132,15 @@ export default {
         center: [121.64, 29.7],
         zoom: 4,
       });
+
       that.map.on("load", function () {
         that.map.addSource("openstreetmap", {
           type: "raster",
           scheme: "xyz",
           tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         });
+
+        // image
         that.map.addSource("testImage", {
           type: "image",
           // 两种方式：1.加载本地image  2.加载网页image
@@ -148,11 +152,141 @@ export default {
             [-80.425, 37.936],
           ],
         });
+
+        // 写在前面添加的layer,位于上方
+
+        // // 直接定义的方式，添加polygon
+        // that.map.addSource("boundingbox", {
+        //   type: "geojson",
+        //   data: {
+        //     type: "FeatureCollection",
+        //     features: [
+        //       {
+        //         type: "Feature",
+        //         geometry: {
+        //           type: "Polygon",
+        //           coordinates: [
+        //             [
+        //               [-80.425, 46.437],
+        //               [-71.516, 46.437],
+        //               [-71.516, 37.936],
+        //               [-80.425, 37.936],
+        //               [-80.425, 46.437],
+        //             ],
+        //           ],
+        //         },
+        //       },
+        //     ],
+        //   },
+        // });
+
+        // 灾害 - 点图层，多种图标
+        // 地震
+        that.map.loadImage(
+          require("../assets/earthquake.png"),
+          (error, image) => {
+            if (error) throw error;
+            that.map.addImage("earthquake", image);
+
+            axios.get("/static/data/points.json").then((res) => {
+              that.map.addLayer({
+                id: "points",
+                type: "symbol",
+                source: {
+                  type: "geojson",
+                  data: res.data,
+                },
+                layout: {
+                  "icon-image": "earthquake",
+                  "icon-size": 0.25,
+                },
+              });
+            });
+          }
+        );
+
+        // 森林大火
+        that.map.loadImage(
+          require("../assets/forestfire.png"),
+          (error, image) => {
+            if (error) throw error;
+            that.map.addImage("forestfire", image);
+
+            axios.get("/static/data/forestfire_points.json").then((res) => {
+              that.map.addLayer({
+                id: "forestfire_points",
+                type: "symbol",
+                source: {
+                  type: "geojson",
+                  data: res.data,
+                },
+                layout: {
+                  "icon-image": "forestfire",
+                  "icon-size": 0.25,
+                },
+              });
+            });
+          }
+        );
+
+        // 暴雨
+        that.map.loadImage(
+          require("../assets/rainstorm.png"),
+          (error, image) => {
+            if (error) throw error;
+            that.map.addImage("rainstorm", image);
+
+            axios.get("/static/data/rainstorm_points.json").then((res) => {
+              that.map.addLayer({
+                id: "rainstorm_points",
+                type: "symbol",
+                source: {
+                  type: "geojson",
+                  data: res.data,
+                },
+                layout: {
+                  "icon-image": "rainstorm",
+                  "icon-size": 0.25,
+                },
+              });
+            });
+          }
+        );
+
         that.map.addLayer({
           id: "testImage",
           type: "raster",
           source: "testImage",
         });
+
+        // 读取geojson文件，加载要素
+        axios.get("/static/data/boundingbox.json").then((res) => {
+          that.map.addLayer({
+            id: "boundingbox",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: res.data,
+            },
+            layout: {},
+            paint: {
+              "line-color": "#088",
+              "line-width": 1.0,
+            },
+          });
+        });
+
+        // that.map.addLayer({
+        //   id: "boundingbox",
+        //   type: "fill",  // 多边形填充
+        //   source: "boundingbox",
+        //   layout: {},
+        //   paint: {
+        //     "fill-color": "#088",
+        //     "fill-opacity": 0.8,
+        //   },
+        // });
+
         that.map.addLayer({
           id: "openstreetmap",
           type: "raster",
@@ -183,6 +317,35 @@ export default {
       });
       this.map.on("draw.create", this.updateArea);
       this.map.addControl(this.draw);
+
+      // Create a popup, but don't add it to the map yet.
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+      });
+
+      that.map.on("mouseenter", "rainstorm_points", function (e) {
+        // Change the cursor style as a UI indicator.
+        that.map.getCanvas().style.cursor = "pointer";
+
+        var coordinates = e.features[0].geometry.coordinates.slice();
+        var description = e.features[0].properties.description;
+
+        console.log(description);
+
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(coordinates).setHTML(description).addTo(that.map);
+      });
+
+      that.map.on("mouseleave", "rainstorm_points", function () {
+        that.map.getCanvas().style.cursor = "";
+        popup.remove();
+      });
     },
     updateArea(e) {
       debugger;

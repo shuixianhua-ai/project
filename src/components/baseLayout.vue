@@ -24,7 +24,7 @@
         </el-aside>
         <el-container>
           <el-main>
-            <mainmap>aa</mainmap>
+            <mainmap> </mainmap>
           </el-main>
         </el-container>
       </el-container>
@@ -105,5 +105,8 @@ body > .el-container {
   border-radius: 4px;
   /* line-height: 20px; */
 }
-
+.image {
+  width: 100%;
+  display: block;
+}
 </style>

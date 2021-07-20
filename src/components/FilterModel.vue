@@ -17,7 +17,7 @@
       @change="handleCheckedSensorsChange"
     >
       <el-row>
-        <el-checkbox v-for="sensor in sensors" :label="sensor" :key="sensor">
+        <el-checkbox v-for="sensor in Options" :label="sensor" :key="sensor">
           <el-col :span="6"
             ><div id="sensor-block">{{ sensor }}</div></el-col
           >
@@ -28,20 +28,30 @@
 </template>
 
 <script>
-const SensorOptions = ["Landsat", "ZY", "TM", "SEASAT"];
+// const SensorOptions = ['Optical', 'Radar'];
+// const ResolutionOptions = ['Very High','High','Medium','Low','Very Low']
+// const SatelliteOptions = ['LANDSAT','GF','SENTINEL','TENDEM']
 export default {
   name: "filterModel",
+  props: {
+    Options: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
     return {
       checkAll: false,
       checkedSensors: [],
-      sensors: SensorOptions,
+      //  sensors: SensorOptions,
+      //  resolutions: ResolutionOptions,
+      //  satellites: SatelliteOptions,
       isIndeterminate: true,
     };
   },
   methods: {
     handleCheckAllChange(val) {
-      this.checkedSensors = val ? SensorOptions : [];
+      this.checkedSensors = val ? Options : [];
       this.isIndeterminate = false;
     },
     handleCheckedSensorsChange(value) {
@@ -55,7 +65,8 @@ export default {
 </script>
 
 <style scoped>
-.sensor-block {
+.sensor-block,
+.el-col {
   text-align: start;
 }
 </style>

@@ -34,7 +34,11 @@ h2 {
   -moz-osx-font-smoothing: grayscale;
   color: #ffffff;
   text-align: left;
-  margin-top: 0px;
+  margin-top: 10px;
+}
+
+.btn {
+  margin-top: 10px;
 }
 
 /* .btn {
