@@ -5,7 +5,7 @@
         <filterType />
       </el-collapse-item>
       <el-collapse-item title="Selected by Time" name="2">
-        <filterModel />
+        <filterTime />
       </el-collapse-item>
     </el-collapse>
     <div style="margin: 15px 0"></div>
@@ -45,6 +45,7 @@
 import filterModel from "./FilterModel";
 
 import filterType from "./Filtertype.vue";
+import filterTime from "./Filter-disaster-time.vue"
 
 export default {
   name: "filterOfPictures",
@@ -61,6 +62,7 @@ export default {
   components: {
     filterModel: filterModel,
     filterType: filterType,
+    filterTime:filterTime,
   },
 };
 </script>
