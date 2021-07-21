@@ -12,14 +12,16 @@
             type="border-card"
             @tab-click="handleClick"
           >
-            <el-tab-pane label="功能1">
+            <el-tab-pane label="Activation">
               <filterOfDisaster />
             </el-tab-pane>
-            <el-tab-pane label="功能2">
+            <el-tab-pane label="Acquisitions">
               <filterOfPictures />
             </el-tab-pane>
-            <el-tab-pane label="功能3">功能3</el-tab-pane>
-            <el-tab-pane label="功能4">功能4</el-tab-pane>
+            <el-tab-pane label="Products">
+              <productofPage />
+            </el-tab-pane>
+            <!-- <el-tab-pane label="功能4">功能4</el-tab-pane> -->
           </el-tabs>
         </el-aside>
         <el-container>
@@ -37,6 +39,9 @@ import mainmap from "./mainpage";
 import headOfPage from "./Header";
 import filterOfPictures from "./Filter";
 import filterOfDisaster from "./FilterDisaster.vue";
+import productofPage from "./Products";
+
+import axios from "axios";
 
 export default {
   name: "baseLayout",
@@ -55,18 +60,22 @@ export default {
     headOfPage: headOfPage,
     filterOfPictures: filterOfPictures,
     filterOfDisaster: filterOfDisaster,
+    productofPage: productofPage,
   },
 };
+
+// 前端读数据
+let url = "http://localhost:11000/disaster/disaster/get/?id=111";
+
+axios({
+  url: url,
+  method: "get",
+}).then((res) => {
+  console.log(res.data);
+});
 </script>
 
 <style>
-/* #baseLayout {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-} */
 html,
 body,
 #baseLayout,

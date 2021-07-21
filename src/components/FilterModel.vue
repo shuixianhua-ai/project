@@ -15,6 +15,7 @@
     <el-checkbox-group
       v-model="checkedSensors"
       @change="handleCheckedSensorsChange"
+      align="left"
     >
       <el-row>
         <el-checkbox v-for="sensor in Options" :label="sensor" :key="sensor">
@@ -51,14 +52,17 @@ export default {
   },
   methods: {
     handleCheckAllChange(val) {
-      this.checkedSensors = val ? Options : [];
+      this.checkedSensors = val ? this.Options : [];
       this.isIndeterminate = false;
+      this.$emit("filterSelection", this.checkedSensors);
     },
     handleCheckedSensorsChange(value) {
       let checkedCount = value.length;
-      this.checkAll = checkedCount === this.sensors.length;
+      this.checkAll = checkedCount === this.Options.length;
       this.isIndeterminate =
-        checkedCount > 0 && checkedCount < this.sensors.length;
+        checkedCount > 0 && checkedCount < this.Options.length;
+      //传值
+      this.$emit("filterSelection", this.checkedSensors);
     },
   },
 };

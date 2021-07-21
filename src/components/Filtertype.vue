@@ -15,6 +15,7 @@
     <el-checkbox-group
       v-model="checkedTypes"
       @change="handleCheckedTypesChange"
+      align="left"
     >
       <el-checkbox
         class="el-checkbox-width"
@@ -34,16 +35,18 @@
 const TypeOptions  = [
   {imgSrc:require('../assets/earthquake.png'),name:"Earthquake"},
   {imgSrc:require('../assets/forestfire.png'),name:"Fire"},
-  {imgSrc:require('../assets/crumble.png'),name:"Crumble"},
-  {imgSrc:require('../assets/pest.png'),name:"Pest"},
+  {imgSrc:require('../assets/crumble.png'),name:"Landslide"},
+  {imgSrc:require('../assets/snow.png'),name:"Snow"},
   {imgSrc:require('../assets/rainstorm.png'),name:"Rainstorm"},
   {imgSrc:require('../assets/typhoon.png'),name:"Typhoon"},
   {imgSrc:require('../assets/vocano.png'),name:"Volcanic eruption"},
+  {imgSrc:require('../assets/oceanwave.png'),name:"Ocean wave"},
   {imgSrc:'',name:"other"},
 
 ];
 export default {
   name: "filterModel",
+  
   data() {
     return {
       checkAll: false,
@@ -54,14 +57,21 @@ export default {
   },
   methods: {
     handleCheckAllChange(val) {
-      this.checkedTypes = val ? TypeOptions  : [];
+      this.checkedTypes = val ? this.Types : [];
+      //console.log(this.checkedTypes);
       this.isIndeterminate = false;
+      this.$emit("filterSelection", this.checkedTypes);
     },
     handleCheckedTypesChange(value) {
       let checkedCount = value.length;
-      this.checkAll = checkedCount === this.Type.length;
+
+      this.checkAll = checkedCount === Object.keys(this.Types).length;
       this.isIndeterminate =
-        checkedCount > 0 && checkedCount < this.Type.length;
+        checkedCount > 0 && checkedCount < Object.keys(this.Types).length;
+
+      
+      //传值
+      this.$emit("filterSelection", this.checkedTypes);
     },
   },
 };
@@ -80,7 +90,8 @@ export default {
   
 }
 .icon-image{
-  height:25px;
-  width:25px;
+  
+  height:20px;
+  width:20px;
 }
 </style>

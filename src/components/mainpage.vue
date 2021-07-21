@@ -153,8 +153,6 @@ export default {
           ],
         });
 
-        // 写在前面添加的layer,位于上方
-
         // // 直接定义的方式，添加polygon
         // that.map.addSource("boundingbox", {
         //   type: "geojson",
@@ -298,7 +296,15 @@ export default {
 
       this.map.on("zoom", function () {
         let zoom = that.map.getZoom();
-        if (zoom < 8) {
+        let pos = that.map.getCenter();
+        var cent = [pos.lng, pos.lat];
+
+        // 地图范围内没有中国且zoom > 8时，替换为osm底图
+        if (
+          zoom < 8 ||
+          (cent[0] > 71 && cent[0] < 125 && cent[1] > 17 && cent[1] < 53) ||
+          (cent[1] > 3 && cent[1] < 20 && cent[0] > 105 && cent[0] < 120)
+        ) {
           that.map.moveLayer("openstreetmap", "tdtvec");
         } else {
           that.map.moveLayer("openstreetmap", "tdtcta");
