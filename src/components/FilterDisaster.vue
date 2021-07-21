@@ -2,14 +2,10 @@
   <div class="tags">
     <el-collapse v-model="CollapseActiveNames" @change="queryType">
       <el-collapse-item title="Selected by Disaster Type" name="1">
-        <filterType 
-        @filterSelection="getSelection"
-        
-        />
+        <filterType @filterSelection="getSelection" />
       </el-collapse-item>
       <el-collapse-item title="Selected by Time" name="2">
-        <filterTime 
-        @filterSelectionTime="getSelectionTime"/>
+        <filterTime @filterSelectionTime="getSelectionTime" />
       </el-collapse-item>
     </el-collapse>
     <div style="margin: 15px 0"></div>
@@ -21,7 +17,6 @@
         v-for="(img, index) in imgList"
         :key="index"
         v-show="img.isdisplay"
-        
       >
         <el-col>
           <el-divider></el-divider>
@@ -36,8 +31,8 @@
             <div class="imginformation">
               <div id="disastername" class="namesytle">{{ img.type }}</div>
               <div class="viceinformation">
-                <h id="disaster-country">country: {{img.country}} </h> <br />
-                <h id="disaster-date">time: {{img.date}} </h>
+                <h id="disaster-country">country: {{ img.country }} </h> <br />
+                <h id="disaster-date">time: {{ img.date }} </h>
               </div>
               <el-button
                 plain
@@ -65,63 +60,62 @@ export default {
     return {
       CollapseActiveNames: [],
       selectionContent: [],
-      selectionTime:[],
+      selectionTime: [],
       imgList: [
         {
-          id:"1",
+          id: "1",
           name: "img1",
           type: "Rainstorm",
-          country:"China",
-          date:"2020-09-02",
-          isdisplay_type:true,
-          isdisplay_time:true,
-          isdisplay_country:true,
-          isdisplay:true,
+          country: "China",
+          date: "2020-09-02",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
         },
         {
-          id:"2",
+          id: "2",
           name: "img2",
           type: "Typhoon",
-          country:"UK",
-          date:"2018-01-02",
-          isdisplay_type:true,
-          isdisplay_time:true,
-          isdisplay_country:true,
-          isdisplay:true,
+          country: "UK",
+          date: "2018-01-02",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
         },
         {
-          id:"3",
+          id: "3",
           name: "img3",
           type: "Earthquake",
-          country:"USA",
-          date:"2010-12-26",
-          isdisplay_type:true,
-          isdisplay_time:true,
-          isdisplay_country:true,
-          isdisplay:true,
-
+          country: "USA",
+          date: "2010-12-26",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
         },
         {
-          id:"4",
+          id: "4",
           name: "img4",
           type: "Rainstorm",
-          country:"Indonesia",
-          date:"2006-08-16",
-          isdisplay_type:true,
-          isdisplay_time:true,
-          isdisplay_country:true,
-          isdisplay:true,
+          country: "Indonesia",
+          date: "2006-08-16",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
         },
         {
-          id:"5",
+          id: "5",
           name: "img5",
           type: "Landslide",
-          country:"Korea",
-          date:"2000-05-02",
-          isdisplay_type:true,
-          isdisplay_time:true,
-          isdisplay_country:true,
-          isdisplay:true,
+          country: "Korea",
+          date: "2000-05-02",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
         },
       ],
     };
@@ -130,17 +124,13 @@ export default {
     handleChange(val) {
       console.log(val);
     },
-    changetype(val){
-
-    },
+    changetype(val) {},
     getSelection(selection) {
       //目前仅针对satellite的filter
       this.selectionContent = selection;
     },
-    getSelectionTime(selection)
-    {
-      this.selectionTime=selection;
-
+    getSelectionTime(selection) {
+      this.selectionTime = selection;
     },
     queryType() {
       //按type过滤
@@ -149,33 +139,35 @@ export default {
           console.log(this.selectionContent[j].name);
           if (this.imgList[i].type == this.selectionContent[j].name) {
             this.imgList[i].isdisplay_type = true;
-            
+
             break;
-          }
-           else this.imgList[i].isdisplay_type = false;
+          } else this.imgList[i].isdisplay_type = false;
         }
       }
 
-        //按时间过滤
-        for (var i = 0; i < this.imgList.length; i++) {
-          var year=this.imgList[i].date.substr(0,4);
-          var month=this.imgList[i].date.substr(5,2);
-          var datanumber=(parseInt(year)-2000)*12+parseInt(month);
-          console.log(this.selectionTime);
-          
-          if(datanumber<=Math.max(this.selectionTime[0],this.selectionTime[1])&&datanumber>=Math.min(this.selectionTime[0],this.selectionTime[1]))
-          {
-            this.imgList[i].isdisplay_time = true;
-          }
-          else
-          {
-            this.imgList[i].isdisplay_time = false;
-          }
-        
-        this.imgList[i].isdisplay=this.imgList[i].isdisplay_type&&this.imgList[i].isdisplay_time&&this.imgList[i].isdisplay_country;
+      //按时间过滤
+      for (var i = 0; i < this.imgList.length; i++) {
+        var year = this.imgList[i].date.substr(0, 4);
+        var month = this.imgList[i].date.substr(5, 2);
+        var datanumber = (parseInt(year) - 2000) * 12 + parseInt(month);
+        console.log(this.selectionTime);
+
+        if (
+          datanumber <=
+            Math.max(this.selectionTime[0], this.selectionTime[1]) &&
+          datanumber >= Math.min(this.selectionTime[0], this.selectionTime[1])
+        ) {
+          this.imgList[i].isdisplay_time = true;
+        } else {
+          this.imgList[i].isdisplay_time = false;
+        }
+
+        this.imgList[i].isdisplay =
+          this.imgList[i].isdisplay_type &&
+          this.imgList[i].isdisplay_time &&
+          this.imgList[i].isdisplay_country;
       }
     },
-      
   },
   components: {
     filterModel: filterModel,

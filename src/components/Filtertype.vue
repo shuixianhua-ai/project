@@ -23,35 +23,33 @@
         :label="type"
         :key="type"
       >
-        <img :src="type.imgSrc" class="icon-image"/>
-        <span id="sensor-block"> {{type.name}} </span>
-        
+        <img :src="type.imgSrc" class="icon-image" />
+        <span id="sensor-block"> {{ type.name }} </span>
       </el-checkbox>
     </el-checkbox-group>
   </div>
 </template>
 
 <script>
-const TypeOptions  = [
-  {imgSrc:require('../assets/earthquake.png'),name:"Earthquake"},
-  {imgSrc:require('../assets/forestfire.png'),name:"Fire"},
-  {imgSrc:require('../assets/crumble.png'),name:"Landslide"},
-  {imgSrc:require('../assets/snow.png'),name:"Snow"},
-  {imgSrc:require('../assets/rainstorm.png'),name:"Rainstorm"},
-  {imgSrc:require('../assets/typhoon.png'),name:"Typhoon"},
-  {imgSrc:require('../assets/vocano.png'),name:"Volcanic eruption"},
-  {imgSrc:require('../assets/oceanwave.png'),name:"Ocean wave"},
-  {imgSrc:'',name:"other"},
-
+const TypeOptions = [
+  { imgSrc: require("../assets/earthquake.png"), name: "Earthquake" },
+  { imgSrc: require("../assets/forestfire.png"), name: "Fire" },
+  { imgSrc: require("../assets/crumble.png"), name: "Landslide" },
+  { imgSrc: require("../assets/snow.png"), name: "Snow" },
+  { imgSrc: require("../assets/rainstorm.png"), name: "Rainstorm" },
+  { imgSrc: require("../assets/typhoon.png"), name: "Typhoon" },
+  { imgSrc: require("../assets/vocano.png"), name: "Volcanic eruption" },
+  { imgSrc: require("../assets/oceanwave.png"), name: "Ocean wave" },
+  { imgSrc: "", name: "other" },
 ];
 export default {
   name: "filterModel",
-  
+
   data() {
     return {
       checkAll: false,
       checkedTypes: [],
-      Types: TypeOptions ,
+      Types: TypeOptions,
       isIndeterminate: true,
     };
   },
@@ -69,7 +67,6 @@ export default {
       this.isIndeterminate =
         checkedCount > 0 && checkedCount < Object.keys(this.Types).length;
 
-      
       //传值
       this.$emit("filterSelection", this.checkedTypes);
     },
@@ -83,15 +80,11 @@ export default {
 }
 .el-checkbox-width {
   width: 140px;
-  
-  text-align: left;
 
-  
-  
+  text-align: left;
 }
-.icon-image{
-  
-  height:20px;
-  width:20px;
+.icon-image {
+  height: 20px;
+  width: 20px;
 }
 </style>

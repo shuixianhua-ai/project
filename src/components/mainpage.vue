@@ -11,12 +11,27 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import mapUrl from "../util/mapUrl";
 import axios from "axios";
 
+import bus from "./eventBus";
+
 export default {
   name: "mainmap",
   data() {
     return {
+      flag: true,
       map: {}, // map 主变量属性
       draw: {},
+      imgList: [
+        {
+          id: "1",
+          isDisplay: false,
+          boundingBox: false,
+        },
+        {
+          id: "2",
+          isDisplay: false,
+          boundingBox: false,
+        },
+      ],
       tianStyle: {
         version: 8,
         glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
@@ -120,10 +135,56 @@ export default {
   },
   mounted() {
     this.init();
+    var self = this;
+    bus.$on("MainpageFlag", function (id, flag) {
+      // 1. 在imgList中，查询是否存在该id，若存在，则更改其flag；若不存在，则在列表中增加该对象
+
+      var modiIndex = self.imgList.findIndex((v) => {
+        return v.id == id;
+      });
+      if (modiIndex < 0) {
+        self.imgList.push({
+          id: id,
+          isDisplay: true,
+          boundingBox: false,
+        });
+      } else {
+        self.imgList[modiIndex].isDisplay = !self.imgList[modiIndex].isDisplay;
+      }
+
+      // 遍历ImgList
+      for (var i = 1; i <= self.imgList.length; i++) {
+        var tempId = "Image" + i;
+        var tempUrl = require("../assets/img/img" + i + ".gif");
+        if (self.imgList[i - 1].isDisplay == true) {
+          self.map.addLayer({
+            id: tempId,
+            type: "raster",
+            source: {
+              type: "image",
+              // 两种方式：1.加载本地image  2.加载网页image
+              url: tempUrl, //"https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif"
+              coordinates: [
+                [-80.425, 46.437],
+                [-71.516, 46.437],
+                [-71.516, 37.936],
+                [-80.425, 37.936],
+              ],
+            },
+          });
+        } else if (self.imgList[i - 1].isDisplay == false) {
+          if (self.map.getLayer(tempId)) {
+            self.map.removeLayer(tempId);
+            self.map.removeSource(tempId);
+          }
+        }
+      }
+    });
   },
   methods: {
     init() {
       let that = this;
+
       mapboxgl.accessToken = mapUrl.MapaccessToken;
       this.map = new mapboxgl.Map({
         container: "map",
@@ -134,6 +195,7 @@ export default {
       });
 
       that.map.on("load", function () {
+        // 只在地图首次加载的过程中被运行
         that.map.addSource("openstreetmap", {
           type: "raster",
           scheme: "xyz",
@@ -251,11 +313,11 @@ export default {
           }
         );
 
-        that.map.addLayer({
-          id: "testImage",
-          type: "raster",
-          source: "testImage",
-        });
+        // that.map.addLayer({
+        //   id: "testImage",
+        //   type: "raster",
+        //   source: "testImage",
+        // });
 
         // 读取geojson文件，加载要素
         axios.get("/static/data/boundingbox.json").then((res) => {

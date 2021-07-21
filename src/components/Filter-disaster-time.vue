@@ -13,7 +13,6 @@
             :max="251"
             :marks="marks"
             :format-tooltip="formatTooltip"
-           
           >
           </el-slider></div
       ></el-col>
@@ -23,7 +22,7 @@
 
 
 <script>
-const Time  = ["Jan","2000",]
+const Time = ["Jan", "2000"];
 function getArrayIndex(arr, obj) {
   var i = arr.length;
   while (i--) {
@@ -47,7 +46,7 @@ const Months = [
   "Nov",
   "Dec",
 ];
-const timerange=[0,251];
+const timerange = [0, 251];
 const x =
   ("2021" - "2000") * 12 +
   getArrayIndex(Months, "Dev") -
@@ -58,7 +57,7 @@ export default {
   name: "filterTime",
   data() {
     return {
-      Timerange:timerange,
+      Timerange: timerange,
       marks: {
         0: "Jan,2000",
 
@@ -68,7 +67,6 @@ export default {
   },
   methods: {
     formatTooltip(val) {
-      
       let month = Months[0];
       let year = 2000;
       year = parseInt(val / 12);
@@ -76,13 +74,13 @@ export default {
       year = 2000 + year;
 
       let time = month + "," + year;
-      
-      this.Timerange[0]=this.markInter[0];
-      this.Timerange[1]=this.markInter[1];
-     // console.log(this.Timerange);
-      
+
+      this.Timerange[0] = this.markInter[0];
+      this.Timerange[1] = this.markInter[1];
+      // console.log(this.Timerange);
+
       this.$emit("filterSelectionTime", this.Timerange);
-      
+
       return time;
     },
   },
