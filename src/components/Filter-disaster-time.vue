@@ -10,7 +10,7 @@
             range
             show-stops
             :step="1"
-            :max="251"
+            :max="263"
             :marks="marks"
             :format-tooltip="formatTooltip"
           >
@@ -46,7 +46,7 @@ const Months = [
   "Nov",
   "Dec",
 ];
-const timerange = [0, 251];
+const timerange = [0, 263];
 const x =
   ("2021" - "2000") * 12 +
   getArrayIndex(Months, "Dev") -
@@ -61,7 +61,7 @@ export default {
       marks: {
         0: "Jan,2000",
 
-        251: "Dev,2021",
+        263: "Dec,2021",
       },
     };
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="tags">
-    <el-collapse v-model="CollapseActiveNames" @change="queryType">
+    <el-collapse v-model="CollapseActiveNames" @change="changetype">
       <el-collapse-item title="Selected by Disaster Type" name="1">
         <filterType @filterSelection="getSelection" />
       </el-collapse-item>
@@ -21,12 +21,13 @@
         <el-col>
           <el-divider></el-divider>
           <div>
-            <el-card shadow="hover" class="imgfix">
+            <el-card shadow="hover" class="imgfix" @click.native="clickinfo">
               <img
                 :src="require('../assets/disaster-img/img' + img.id + '.png')"
                 class="image"
                 height="70px"
               />
+              <div style="font-size:5px"></div>
             </el-card>
             <div class="imginformation">
               <div id="disastername" class="namesytle">{{ img.name }}</div>
@@ -34,11 +35,17 @@
                  <h id="disaster-date">time: {{ img.date }} </h><br />
                 <h id="disaster-type">type: {{ img.type }} </h>
               </div>
+              <!--el-button
+              size = "mini"
+              type = "info"
+              icon = "el-icon-info"
+              circle plain
+              ></el-button>-->
               <el-button
                 plain
                 class="located-button"
                 type="primary"
-                :loading="true"
+                
                 >Locate on map</el-button
               >
             </div>
@@ -138,6 +145,9 @@ export default {
   methods: {
     handleChange(val) {
       console.log(val);
+    },
+    clickinfo() {
+      console.log("success");
     },
     changetype(val) {},
     getSelection(selection) {
@@ -243,6 +253,8 @@ export default {
   text-align: center;
   padding: 2px;
 }
+
+
 
 .clearfix:before,
 .clearfix:after {
