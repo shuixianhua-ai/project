@@ -23,16 +23,16 @@
           <div>
             <el-card shadow="hover" class="imgfix">
               <img
-                :src="require('../assets/disaster-img/' + img.name + '.png')"
+                :src="require('../assets/disaster-img/img' + img.id + '.png')"
                 class="image"
                 height="70px"
               />
             </el-card>
             <div class="imginformation">
-              <div id="disastername" class="namesytle">{{ img.type }}</div>
+              <div id="disastername" class="namesytle">{{ img.name }}</div>
               <div class="viceinformation">
-                <h id="disaster-country">country: {{ img.country }} </h> <br />
-                <h id="disaster-date">time: {{ img.date }} </h>
+                 <h id="disaster-date">time: {{ img.date }} </h><br />
+                <h id="disaster-type">type: {{ img.type }} </h>
               </div>
               <el-button
                 plain
@@ -64,10 +64,13 @@ export default {
       imgList: [
         {
           id: "1",
-          name: "img1",
+          name: "Flooding in Switzerland",
           type: "Rainstorm",
-          country: "China",
-          date: "2020-09-02",
+          country: "Switzerland",
+          date: "2021-07-15,18:23:00",
+          description:"Heavy rainfall has caused severe flooding in parts of Switzerland. Trees have been blown onto roads and rail tracks in Zurich, causing travel chaos for commuters.A warning issued to citizens has stated that several rivers could burst their banks, while some Alpine passes were temporarily closed due to heavy snowfall.More than four centimetres of rain fell on Zurich overnight on Monday 12 July 2021 and over 3.1 centimetres of rain fell in just 10 minutes on nearby Waldegg, according to broadcaster SRF.Officials in the de facto capital, Bern, are preparing for possible flooding by installing floating dams. The country's meteorological services have warned that further rain is forecast, and also urged caution of potential landslides.Authorities near Lake Lucerne, Lake Geneva, and Lake Zurich have also issued alerts for local residents and shipping companies. Lake Lucerne, in particular, is at a very high risk of flooding, warned MeteoSchweiz.",
+          requestor:"SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+          management:"Swiss Federal Office of Topography",
           isdisplay_type: true,
           isdisplay_time: true,
           isdisplay_country: true,
@@ -75,43 +78,55 @@ export default {
         },
         {
           id: "2",
-          name: "img2",
-          type: "Typhoon",
-          country: "UK",
-          date: "2018-01-02",
+          name: "Chemical factory explosion in Thailand",
+          type: "Fire",
+          country: "Thailand",
+          date: "2021-07-06,10:32:00",
+          description:"An explosion occurred about 03:00 am on 5 July 2021 at the Ming Dih Chemical factory, a factory producing plastic foam and plastic pellets, in Bang Phli district, Samut Prakan province, the outskirts of Thailand's capital.",
+          requestor:"UNITAR on behalf of UNOCHA",
+          management:"UNITAR",
           isdisplay_type: true,
           isdisplay_time: true,
           isdisplay_country: true,
           isdisplay: true,
         },
         {
-          id: "3",
-          name: "img3",
-          type: "Earthquake",
-          country: "USA",
-          date: "2010-12-26",
-          isdisplay_type: true,
-          isdisplay_time: true,
-          isdisplay_country: true,
-          isdisplay: true,
-        },
-        {
-          id: "4",
-          name: "img4",
-          type: "Rainstorm",
-          country: "Indonesia",
-          date: "2006-08-16",
-          isdisplay_type: true,
-          isdisplay_time: true,
-          isdisplay_country: true,
-          isdisplay: true,
-        },
-        {
-          id: "5",
-          name: "img5",
+           id: "3",
+          name: "Floods and landslides in Ecuador",
           type: "Landslide",
-          country: "Korea",
-          date: "2000-05-02",
+          country: "Ecuador",
+          date: "2012-03-10,11:30:00",
+          description:"Heavy rains continued to pour inJocay, Ecuadorthis week, causing flooding across coastal communities. In an official statement from the Ecuadorian government, they announced that at least 20 people were killed and 65 people were severly injured due to flooding withincoastal provinces. 166 homes have been destroyed and 2,823 people have been evacuated from their homes to sheltersand other communities. In February, hundreds of people fled their homes to seek shelter after severe rains caused floods and damaged local crops and produce. Ecuador's National Institute of Meteorology and Hydrologyforecast further heavy rains during the months of March and April.",
+          requestor:"USGS on behalf of Secretaría Nacional de Gestión de Riesgos - SNGR (Ecuador)",
+          management:"Oficina de Gestión Corporativa de CLIRSEN Quito - ECUADOR",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
+        },
+        {
+           id: "4",
+          name: "Volcanic eruption in Iceland",
+          type: "Volcanic eruption",
+          country: "Iceland",
+          date: "2010-04-10,11:00:00",
+          description:"A volcanic eruption in Iceland spread black smoke and white steam into the air and partly melted a glacier, 700 people have been evacuated. As a consequence of the smoke cloud, most of the european airspace has been progressively closed.",
+          requestor:"Ministry of the Interior – Direction de la Sécurité Civile - COGIC",
+          management:"	CNES in collaboration with the SAFER project in the framework of the GMES initiative",
+          isdisplay_type: true,
+          isdisplay_time: true,
+          isdisplay_country: true,
+          isdisplay: true,
+        },
+        {
+           id: "5",
+          name: "Earthquake in China",
+          type: "Earthquake",
+          country: "China",
+          date: "2021-05-22,00:36:00",
+          description:"A 7.4-magnitude earthquake struck Northwest China's Qinghai province on 22 May 2021. The quake struck Maduo county of Golog Tibetan autonomous prefecture at 2:04 am.The epicenter was monitored at 34.59 degrees north latitude and 98.34 degrees east longitude and struck at a depth of 17 km. There have been no reports of casualties and house collapses, however highway sections and bridges have collapsed in the quake-hit area making it impassable to vehicles.",
+          requestor:"	National Disaster Reduction Center of China (NDRCC)",
+          management:"CNSA",
           isdisplay_type: true,
           isdisplay_time: true,
           isdisplay_country: true,
@@ -202,26 +217,26 @@ export default {
 }
 .namesytle {
   position: absolute;
-  top: 10px;
+  top: 2px;
   width: 100%;
-  left: 16px;
+  left: 12px;
   text-align: left;
-  font-size: 26px;
+  font-size: 20px;
 }
 .viceinformation {
   position: absolute;
-  top: 44px;
+  top: 72px;
   width: 100%;
   right: 20px;
   text-align: right;
-  font-size: 12px;
+  font-size: 10px;
   color: #999;
 }
 
 .located-button {
   float: right;
   position: absolute;
-  top: 100px;
+  top: 110px;
   right: 5px;
   height: 24px;
   width: 150px;

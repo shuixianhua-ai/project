@@ -105,7 +105,7 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "LANDSAT",
-          date:"2020-01-20",
+          date:"2020-01-20,18:00:00",
           isdisplay: false,
         },
         {
@@ -114,7 +114,7 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "GF",
-          date:"2019-12-29",
+          date:"2019-12-29,12:08:46",
           isdisplay: false,
         },
         {
@@ -123,7 +123,7 @@ export default {
           sensor: "Radar",
           resolution: "Low",
           satellite: "KOMPSAT",
-          date:"2020-01-08",
+          date:"2020-01-08,16:55:06",
           isdisplay: false,
         },
         {
@@ -132,7 +132,7 @@ export default {
           sensor: "Optical",
           resolution: "Very Low",
           satellite: "SENTINEL",
-          date:"2020-01-13",
+          date:"2020-01-13,03:01:04",
           isdisplay: false,
         },
         {
@@ -141,7 +141,7 @@ export default {
           sensor: "Radar",
           resolution: "Very High",
           satellite: "TENDEM",
-          date:"2020-01-01",
+          date:"2020-01-01,00:12:59",
           isdisplay: false,
         },
       ],
@@ -248,8 +248,11 @@ export default {
         var year = this.imgList[i].date.substr(0, 4);
         var month = this.imgList[i].date.substr(5, 2);
         var date = this.imgList[i].date.substr(8, 2);
-        var datanumber = new Date(Date.UTC(year,month-1,date));
-        console.log(date);
+        var hour=this.imgList[i].date.substr(11,2);
+        var min=this.imgList[i].date.substr(14,2);
+        var s=this.imgList[i].date.substr(17,2);
+        var datanumber = new Date(Date.UTC(year,month-1,date,hour,min,s));
+        console.log(datanumber);
         console.log(this.selectionTime2);
 
         if (

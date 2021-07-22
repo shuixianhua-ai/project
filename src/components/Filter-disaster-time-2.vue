@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       Timerange2: timerange2,
-      disastertime:"2020-01-13",
+      disastertime:"2020-01-13,20:13:09",
       marks:{
         0:"before",
         30:"disaster",
@@ -47,7 +47,11 @@ export default {
       let year = parseInt(this.disastertime.substr(0,4));
       let month = parseInt(this.disastertime.substr(5,2));
       let date = parseInt(this.disastertime.substr(8,2));
-      var disastertime = new Date(Date.UTC(year,month-1,date));
+      let hour=parseInt(this.disastertime.substr(11,2));
+      let min=parseInt(this.disastertime.substr(14,2));
+      let s=parseInt(this.disastertime.substr(17,2));
+
+      var disastertime = new Date(Date.UTC(year,month-1,date,hour,min,s));
 
       //获取滑块对应时间
       var nowtime = disastertime - ((30-val) * 86400000);
