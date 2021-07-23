@@ -27,6 +27,7 @@
         <filterTime2 @filterSelectionTime2="getSelectionTime2" />
       </el-collapse-item>
     </el-collapse>
+
     <div style="margin: 15px 0"></div>
     <div>
       <el-button round @click="queryInfoClick">Summit</el-button>
@@ -35,7 +36,7 @@
     <div style="margin: 15px 0"></div>
     <el-row>
       <el-col
-        :span="10"
+        :span="11"
         v-for="(img, index) in imgList"
         :key="index"
         :offset="1"
@@ -47,9 +48,30 @@
             :src="require('../assets/raster/' + img.name + '.jpg')"
             class="image"
           />
-          <div style="padding: 10px">
-            {{ img.name }}
-            <div class="bottom clearfix">{{ img.satellite }}</div>
+          <div class="infodisplay" style="padding: 10px">
+            <el-collapse v-model="activeNames" @change="handleChange">
+              <el-collapse-item class="subcollapse">
+                <template slot="title">
+                  <div style="font-size: 16px">
+                    <button class="button_info"></button> {{ img.name }}
+                  </div>
+                </template>
+                <div class="bottom clearfix" style="font-size: 14px">
+                  <i class="el-icon-caret-right"></i> {{ img.sensor }}<br />
+                  <i class="el-icon-caret-right"></i> {{ img.resolution }}<br />
+                  <i class="el-icon-caret-right"></i> {{ img.satellite }}
+                  <el-button
+                    class="locate"
+                    type="info"
+                    size="mini"
+                    icon="el-icon-location"
+                    v-on:click="sendLocFlag(img.id)"
+                    plain
+                    circle
+                  ></el-button>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
             <div style="margin: 10px 0"></div>
             <el-button
               size="mini"
@@ -57,7 +79,7 @@
               icon="el-icon-view"
               circle
               plain
-              v-on:click="sendFlag"
+              v-on:click="sendImgFlag(img.id)"
             ></el-button>
             <el-button
               size="mini"
@@ -72,6 +94,7 @@
               type="info"
               icon="el-icon-full-screen"
               circle
+              v-on:click="sendBoxFlag(img.id)"
               plain
             ></el-button>
           </div>
@@ -84,8 +107,9 @@
 
 <script>
 import filterModel from "./FilterModel";
+
+import filterTime2 from "./Filter-image-time.vue";
 import bus from "./eventBus";
-import filterTime2 from "./Filter-disaster-time-2.vue";
 
 export default {
   name: "filterOfPictures",
@@ -105,7 +129,9 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "LANDSAT",
-          date:"2020-01-20,18:00:00",
+          date: "2020-01-20",
+          imgDisplay: false,
+          boundingBox: false,
           isdisplay: false,
         },
         {
@@ -114,7 +140,9 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "GF",
-          date:"2019-12-29,12:08:46",
+          date: "2019-12-29",
+          imgDisplay: false,
+          boundingBox: false,
           isdisplay: false,
         },
         {
@@ -122,8 +150,10 @@ export default {
           name: "img3",
           sensor: "Radar",
           resolution: "Low",
-          satellite: "KOMPSAT",
-          date:"2020-01-08,16:55:06",
+          satellite: "LANDSAT",
+          date: "2020-01-08",
+          imgDisplay: false,
+          boundingBox: false,
           isdisplay: false,
         },
         {
@@ -132,7 +162,9 @@ export default {
           sensor: "Optical",
           resolution: "Very Low",
           satellite: "SENTINEL",
-          date:"2020-01-13,03:01:04",
+          date: "2020-01-13",
+          imgDisplay: false,
+          boundingBox: false,
           isdisplay: false,
         },
         {
@@ -141,7 +173,9 @@ export default {
           sensor: "Radar",
           resolution: "Very High",
           satellite: "TENDEM",
-          date:"2020-01-01,00:12:59",
+          date: "2020-01-01",
+          imgDisplay: false,
+          boundingBox: false,
           isdisplay: false,
         },
       ],
@@ -151,9 +185,16 @@ export default {
     };
   },
   methods: {
-    sendFlag() {
-      this.imgFlag = !this.imgFlag;
-      bus.$emit("MainpageFlag", this.imgFlag);
+    sendImgFlag(id) {
+      this.imgList[id].imgDisplay = !this.imgList[id].imgDisplay;
+      bus.$emit("MainpageImg", id, this.imgList[id].imgDisplay);
+    },
+    sendBoxFlag(id) {
+      this.imgList[id].boundingBox = !this.imgList[id].boundingBox;
+      bus.$emit("MainpageBox", id, this.imgList[id].boundingBox);
+    },
+    sendLocFlag(id) {
+      bus.$emit("MainpageLoc", id);
     },
     handleChange(val) {
       console.log(val);
@@ -187,30 +228,6 @@ export default {
       this.$refs.filtermodel3.handleCheckAllChange(false);
     },
     queryInfoClick() {
-      //测试
-      // this.$alert(this.imgList[0], 'selection', {
-      //     confirmButtonText: '确定',
-      //     callback: action => {
-      //       this.$message({
-      //         type: 'info',
-      //         message: `action: ${ action }`
-      //       });
-      //     }
-      //   });
-      // if(this.selectionContent1){
-      //   for(var i = 0; i < this.imgList.length; i++){
-      //       if(this.imgList[i].isflag==false) break;
-      //       for(var j = 0;j < this.selectionContent1.length;j++){
-      //         if(this.imgList[i].sensor == this.selectionContent1[j]){
-      //           this.imgList[i].isdisplay=true;
-      //           break;
-      //         }
-      //         else this.imgList[i].isdisplay=false;
-      //       }
-      //       if(this.imgList[i].isflag && this.imgList[i].isdisplay==false)
-      //         this.imgList[i].isflag=false;
-      //     }
-      // }
       for (var i = 0; i < this.imgList.length; i++) {
         var f1 = 0;
         var f2 = 0;
@@ -243,35 +260,26 @@ export default {
         } else f3 = 1;
 
         //按时间过滤
-      if(this.selectionTime2.length>0)
-      {
-        var year = this.imgList[i].date.substr(0, 4);
-        var month = this.imgList[i].date.substr(5, 2);
-        var date = this.imgList[i].date.substr(8, 2);
-        var hour=this.imgList[i].date.substr(11,2);
-        var min=this.imgList[i].date.substr(14,2);
-        var s=this.imgList[i].date.substr(17,2);
-        var datanumber = new Date(Date.UTC(year,month-1,date,hour,min,s));
-        console.log(datanumber);
-        console.log(this.selectionTime2);
+        if (this.selectionTime2.length > 0) {
+          var year = this.imgList[i].date.substr(0, 4);
+          var month = this.imgList[i].date.substr(5, 2);
+          var date = this.imgList[i].date.substr(8, 2);
+          var datanumber = new Date(Date.UTC(year, month - 1, date));
+          console.log(date);
+          console.log(this.selectionTime2);
 
-        if (
-          datanumber <=
-            Math.max(this.selectionTime2[0], this.selectionTime2[1]) &&
-          datanumber >= Math.min(this.selectionTime2[0], this.selectionTime2[1])
-        ) {
-          f4=1;
-        } 
-        
-      }
-      else f4=1;
-        
-          
-        
+          if (
+            datanumber <=
+              Math.max(this.selectionTime2[0], this.selectionTime2[1]) &&
+            datanumber >=
+              Math.min(this.selectionTime2[0], this.selectionTime2[1])
+          ) {
+            f4 = 1;
+          }
+        } else f4 = 1;
 
-        
-      
-        if (f1 == 1 && f2 == 1 && f3 == 1 && f4==1) this.imgList[i].isdisplay = true;
+        if (f1 == 1 && f2 == 1 && f3 == 1 && f4 == 1)
+          this.imgList[i].isdisplay = true;
         else this.imgList[i].isdisplay = false;
       }
     },
@@ -298,5 +306,25 @@ export default {
 
 .clearfix:after {
   clear: both;
+}
+.infodisplay {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #8c8c8c;
+  text-align: left;
+}
+.button_info {
+  /* display: inline; */
+  border: none;
+  height: 14px;
+  width: 14px;
+  background-image: url(../assets/button_info.png);
+  background-repeat: no-repeat;
+  background-size: 13px 13px;
+}
+.subcollapse >>> .el-collapse-item__header {
+  height: 24px;
+}
+.subcollapse >>> .el-collapse-item__content {
+  padding-bottom: 5px;
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
-  <div id="map" style="width: 100%; height: 100%"></div>
+  <div id="map" style="width: 100%; height: 100%">
+    <selectFrame class="frame" />
+  </div>
 </template>
-
+<!--script src='turf.min.js'></script>-->
 <script>
 //也可以全局引入 但是建议map对象还是少做传值，可以通过组件通信，统一在此处操作
 import mapboxgl from "mapbox-gl";
@@ -10,8 +12,10 @@ import mapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import mapUrl from "../util/mapUrl";
 import axios from "axios";
+import * as turf from "@turf/turf";
 
 import bus from "./eventBus";
+import selectFrame from "./SelectMap.vue";
 
 export default {
   name: "mainmap",
@@ -133,45 +137,50 @@ export default {
       osmStyle: "mapbox://styles/mapbox/streets-v11",
     };
   },
+  components: {
+    selectFrame: selectFrame,
+    // FilterModel,
+  },
   mounted() {
     this.init();
     var self = this;
-    bus.$on("MainpageFlag", function (id, flag) {
+    bus.$on("MainpageImg", function (id, flag) {
       // 1. 在imgList中，查询是否存在该id，若存在，则更改其flag；若不存在，则在列表中增加该对象
-
       var modiIndex = self.imgList.findIndex((v) => {
         return v.id == id;
       });
       if (modiIndex < 0) {
         self.imgList.push({
           id: id,
-          isDisplay: true,
+          isDisplay: flag,
           boundingBox: false,
         });
       } else {
-        self.imgList[modiIndex].isDisplay = !self.imgList[modiIndex].isDisplay;
+        self.imgList[modiIndex].isDisplay = flag;
       }
 
-      // 遍历ImgList
+      // 2. 遍历ImgList，渲染至地图
       for (var i = 1; i <= self.imgList.length; i++) {
         var tempId = "Image" + i;
         var tempUrl = require("../assets/img/img" + i + ".gif");
         if (self.imgList[i - 1].isDisplay == true) {
-          self.map.addLayer({
-            id: tempId,
-            type: "raster",
-            source: {
-              type: "image",
-              // 两种方式：1.加载本地image  2.加载网页image
-              url: tempUrl, //"https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif"
-              coordinates: [
-                [-80.425, 46.437],
-                [-71.516, 46.437],
-                [-71.516, 37.936],
-                [-80.425, 37.936],
-              ],
-            },
-          });
+          if (!self.map.getLayer(tempId)) {
+            self.map.addLayer({
+              id: tempId,
+              type: "raster",
+              source: {
+                type: "image",
+                // 两种方式：1.加载本地image  2.加载网页image
+                url: tempUrl, //"https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif"
+                coordinates: [
+                  [-80.425, 46.437],
+                  [-71.516, 46.437],
+                  [-71.516, 37.936],
+                  [-80.425, 37.936],
+                ],
+              },
+            });
+          }
         } else if (self.imgList[i - 1].isDisplay == false) {
           if (self.map.getLayer(tempId)) {
             self.map.removeLayer(tempId);
@@ -179,6 +188,80 @@ export default {
           }
         }
       }
+    });
+
+    bus.$on("MainpageBox", function (id, flag) {
+      var modiIndex = self.imgList.findIndex((v) => {
+        return v.id == id; //id
+      });
+      if (modiIndex < 0) {
+        self.imgList.push({
+          id: id,
+          isDisplay: false,
+          boundingBox: flag,
+        });
+      } else {
+        self.imgList[modiIndex].boundingBox = flag;
+      }
+
+      // 2. 遍历ImgBox，渲染至地图
+      for (var i = 0; i < self.imgList.length; i++) {
+        var tempId = "boxJson" + (i + 1);
+        var tempRoute = "/static/boundingBox/imgBox" + (i + 1) + ".json";
+
+        if (self.imgList[i].boundingBox == true) {
+          if (!self.map.getLayer(tempId)) {
+            axios.get(tempRoute).then((res) => {
+              self.map.addLayer({
+                id: tempId,
+                type: "line",
+                source: {
+                  type: "geojson",
+                  data: res.data,
+                },
+                layout: {},
+                paint: {
+                  "line-color": "#088",
+                  "line-width": 1.0,
+                },
+              });
+            });
+          } else {
+            map.setLayoutProperty(
+              self.map.getLayer(tempId),
+              "visibility",
+              "visible"
+            );
+          }
+        } else if (self.imgList[i].boundingBox == false) {
+          if (self.map.getLayer(tempId)) {
+            self.map.removeLayer(tempId);
+            self.map.removeSource(tempId);
+          }
+        }
+      }
+    });
+
+    bus.$on("MainpageLoc", function (id) {
+      var modiIndex = self.imgList.findIndex((v) => {
+        return v.id == id; //id
+      });
+      var boxLayer = "boxJson" + id;
+      self.map.flyTo({
+        center: [-80.425, 38.437],
+      });
+
+      // 该影像已添加至地图，且包围盒存在
+      // if (modiIndex >= 0 && self.map.getLayer(boxLayer)) {
+      //   console.log("$$$$$$$$$$$$$$$$$$$$$$$" + id);
+      //   console.log(result.features[0].geometry.coordinates[0]);
+      //   var result = self.map.queryRenderedFeatures(null, {
+      //     layers: [boxLayer], //.filter((layer) => {this.map.getLayer(layer);}),
+      //   });
+      //   self.map.flyTo({
+      //     center: result.features[0].geometry.coordinates[0],
+      //   });
+      // }
     });
   },
   methods: {
@@ -320,21 +403,21 @@ export default {
         // });
 
         // 读取geojson文件，加载要素
-        axios.get("/static/data/boundingbox.json").then((res) => {
-          that.map.addLayer({
-            id: "boundingbox",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: res.data,
-            },
-            layout: {},
-            paint: {
-              "line-color": "#088",
-              "line-width": 1.0,
-            },
-          });
-        });
+        // axios.get("/static/data/boundingbox.json").then((res) => {
+        //   that.map.addLayer({
+        //     id: "boundingbox",
+        //     type: "line",
+        //     source: {
+        //       type: "geojson",
+        //       data: res.data,
+        //     },
+        //     layout: {},
+        //     paint: {
+        //       "line-color": "#088",
+        //       "line-width": 1.0,
+        //     },
+        //   });
+        // });
 
         // that.map.addLayer({
         //   id: "boundingbox",
@@ -416,22 +499,45 @@ export default {
       });
     },
     updateArea(e) {
-      debugger;
-      this.map.addLayer({
-        id: "maine",
-        type: "fill",
-        source: {
-          type: "geojson",
-          data: e.features[0],
-        },
-        paint: {
-          "fill-color": "#4682B4",
-          "fill-opacity": 0.5,
-          "fill-outline-color": "#0e2944",
-        },
+      //debugger;
+      // // 添加图层
+      // this.map.addLayer({
+      //   id: "maine",
+      //   type: "fill",
+      //   source: {
+      //     type: "geojson",
+      //     data: e.features[0],
+      //   },
+      //   paint: {
+      //     "fill-color": "#4682B4",
+      //     "fill-opacity": 0.5,
+      //     "fill-outline-color": "#0e2944",
+      //   },
+      // });
+      //this.draw.delete(e.features[0].id);   // 删除所绘制feature的
+
+      // console.log(this.draw.getAll());
+
+      var aoi = this.draw.getAll();
+      if (aoi.features.length > 0) {
+        // Stringify the GeoJson
+        var convertedData = aoi.features[0].geometry.coordinates[0]; // 一串坐标点
+        //"text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(aoi));
+        console.log(convertedData);
+      }
+
+      var result = this.map.queryRenderedFeatures(null, {
+        layers: ["rainstorm_points"], //.filter((layer) => {this.map.getLayer(layer);}),
       });
-      this.draw.delete(e.features[0].id);
-      console.log(this.draw);
+
+      console.log(
+        "if layer exists:   " + this.map.getLayer("rainstorm_points")
+      );
+      if (result.length > 0) {
+        console.log("result:   " + result[0].geometry.coordinates);
+      } else {
+        console.log("no result");
+      }
     },
   },
 };
@@ -439,3 +545,5 @@ export default {
 
 <style scoped>
 </style>
+
+
