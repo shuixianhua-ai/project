@@ -8,7 +8,7 @@
           ref="filtermodel1"
         ></filterModel>
       </el-collapse-item>
-      <el-collapse-item title="Selected by Resolution" name="2">
+      <el-collapse-item title="Selected by Spatial Resolution" name="2">
         <filterModel
           :Options="ResolutionOptions"
           @filterSelection="getSelection2"
@@ -128,7 +128,7 @@ export default {
           name: "img1",
           sensor: "Optical",
           resolution: "Medium",
-          satellite: "LANDSAT",
+          satellite: "LANDSAT7",
           date: "2019-12-29,13:00:54",
           imgDisplay: false,
           boundingBox: false,
@@ -150,7 +150,7 @@ export default {
           name: "img3",
           sensor: "Radar",
           resolution: "Low",
-          satellite: "LANDSAT",
+          satellite: "LANDSAT8",
           date: "2020-01-08,17:09:56",
           imgDisplay: false,
           boundingBox: false,
@@ -161,7 +161,7 @@ export default {
           name: "img4",
           sensor: "Optical",
           resolution: "Very Low",
-          satellite: "SENTINEL",
+          satellite: "SENTINEL_1A",
           date: "2020-01-13,00:08:48",
           imgDisplay: false,
           boundingBox: false,
@@ -172,7 +172,7 @@ export default {
           name: "img5",
           sensor: "Radar",
           resolution: "Very High",
-          satellite: "TENDEM",
+          satellite: "TANDEM_X",
           date: "2020-01-20,12:00:00",
           imgDisplay: false,
           boundingBox: false,
@@ -181,7 +181,33 @@ export default {
       ],
       SensorOptions: ["Optical", "Radar"],
       ResolutionOptions: ["Very High", "High", "Medium", "Low", "Very Low"],
-      SatelliteOptions: ["LANDSAT", "GF", "SENTINEL", "TENDEM"],
+      SatelliteOptions: [
+        "CBERS4",
+        "GEO_EYE_1",
+        "KANOPUS_V",
+        "KANOPUS_V_IK",
+        "KOMPSAT5",
+        "LANDSAT7",
+        "LANDSAT8",
+        "METEOSAT_11",
+        "RCM-1",
+        "RCM-2",
+        "RCM-3",
+        "RESOURCESAT_2A",
+        "Saocom 1A",
+        "SENTINEL_1A",
+        "SENTINEL_1B",
+        "SENTINEL_2B",
+        "TANDEM_X",
+        "TERRASAR_X",
+        "WORLDVIEW_2",
+        "WORLDVIEW_3",
+        "GF",
+        "FY",
+        "ZY",
+        "HY",
+        "HJ",
+      ],
     };
   },
   methods: {
@@ -264,10 +290,12 @@ export default {
           var year = this.imgList[i].date.substr(0, 4);
           var month = this.imgList[i].date.substr(5, 2);
           var date = this.imgList[i].date.substr(8, 2);
-          var hour=this.imgList[i].date.substr(11,2);
-          var min=this.imgList[i].date.substr(14,2);
-          var s=this.imgList[i].date.substr(17,2);
-          var datanumber = new Date(Date.UTC(year, month - 1, date,hour,min,s));
+          var hour = this.imgList[i].date.substr(11, 2);
+          var min = this.imgList[i].date.substr(14, 2);
+          var s = this.imgList[i].date.substr(17, 2);
+          var datanumber = new Date(
+            Date.UTC(year, month - 1, date, hour, min, s)
+          );
           //console.log(min);
           console.log(this.selectionTime2);
 

@@ -17,42 +17,39 @@
         v-for="(dis, index) in DisasterList"
         :key="index"
         v-show="dis.isdisplay"
-      >
-        <el-col>
-          <el-divider></el-divider>
-          <div>
+        :gutter="20"
+        ><el-divider></el-divider>
+        <el-col :span="8">
+          <div class="pic">
             <el-card
               shadow="hover"
-              class="imgfix"
+              class="card"
               @click.native="clickinfo(dis.id)"
             >
               <img
                 :src="require('../assets/disaster-img/img' + dis.id + '.png')"
                 class="image"
-                height="70px"
               />
-              <div style="font-size: 5px"></div>
             </el-card>
-            <div class="imginformation">
-              <div id="disastername" class="namesytle">{{ dis.name }}</div>
-              <div class="viceinformation">
-                <h id="disaster-date">time: {{ dis.date }} </h><br />
-                <h id="disaster-type">type: {{ dis.type }} </h>
-              </div>
-              <!--el-button
-              size = "mini"
-              type = "info"
-              icon = "el-icon-info"
-              circle plain
-              ></el-button>-->
-              <el-button
-                plain
-                class="located-button"
-                type="primary"
-                v-on:click="sendLocFlag(dis.id)"
-                >Locate on map</el-button
-              >
+            <div style="margin: 30px 0"></div>
+          </div>
+        </el-col>
+        <el-col :span="16">
+          <div class="des">
+            <div style="text-align: left; font-size: 20px">{{ dis.name }}</div>
+            <div style="margin: 15px 0"></div>
+            <div style="text-align: right; font-size: 10px; color: #999">
+              <h id="disaster-date">time: {{ dis.date }} </h><br />
+              <h id="disaster-type">type: {{ dis.type }} </h>
             </div>
+            <div style="margin: 15px 0"></div>
+            <el-button
+              plain
+              class="located-button"
+              type="primary"
+              v-on:click="sendLocFlag(dis.id)"
+              >Locate on map</el-button
+            >
           </div>
         </el-col>
       </el-row>
@@ -63,40 +60,53 @@
       <el-tabs type="border-card">
         <el-row class="row1">
           <el-col :span="5" class="col1">Name:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].name }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].name
+          }}</el-col>
         </el-row>
         <el-row class="row1">
           <el-col :span="5" class="col1">Type of Event:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].type }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].type
+          }}</el-col>
         </el-row>
         <el-row class="row1">
           <el-col :span="5" class="col1">Location:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].country }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].country
+          }}</el-col>
         </el-row>
         <el-row class="row1">
           <el-col :span="5" class="col1">Date:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].date }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].date
+          }}</el-col>
         </el-row>
         <el-row class="row1">
           <el-col :span="5" class="col1">Charter Requestor:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].requestor }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].requestor
+          }}</el-col>
         </el-row>
         <el-row class="row1">
           <el-col :span="5" class="col1">Project Management:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].management }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].management
+          }}</el-col>
         </el-row>
         <el-row>
           <el-col :span="5" class="col1">Description:</el-col>
-          <el-col :span="1" >&ensp;&ensp;</el-col>
-          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].description }}</el-col>
+          <el-col :span="1">&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{
+            this.DisasterList[Selectedid].description
+          }}</el-col>
         </el-row>
-        
       </el-tabs>
     </el-dialog>
   </div>
@@ -206,10 +216,31 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.init();
+    console.log(this.DisasterList.length);
+  },
   methods: {
-    handleChange(val) {
-      console.log(val);
+    // 对 DisasterList添加灾害列表
+    init() {
+      this.DisasterList.push({
+        id: "6",
+        name: "Earthquake in China",
+        type: "Earthquake",
+        country: "China",
+        location: [8, 49],
+        date: "2021-05-22,00:36:00",
+        description:
+          "A 7.4-magnitude earthquake struck Northwest China's Qinghai province on 22 May 2021. The quake struck Maduo county of Golog Tibetan autonomous prefecture at 2:04 am.The epicenter was monitored at 34.59 degrees north latitude and 98.34 degrees east longitude and struck at a depth of 17 km. There have been no reports of casualties and house collapses, however highway sections and bridges have collapsed in the quake-hit area making it impassable to vehicles.",
+        requestor: "	National Disaster Reduction Center of China (NDRCC)",
+        management: "CNSA",
+        isdisplay_type: true,
+        isdisplay_time: true,
+        isdisplay_country: true,
+        isdisplay: true,
+      });
     },
+    handleChange(val) {},
     clickinfo(id) {
       this.dialogVisible = true;
       console.log(this.DisasterList[id - 1].name);
@@ -219,7 +250,9 @@ export default {
     sendLocFlag(id) {
       //var index = id.to
       var loc = this.DisasterList[id - 1].location;
+      var title = this.DisasterList[id - 1].name;
       bus.$emit("LocToDisaster", loc, id);
+      bus.$emit("TitleOfDisaster", title, id);
     },
 
     changetype(val) {},
@@ -281,72 +314,31 @@ export default {
   display: block;
 }
 
-.imgfix {
-  width: 120px;
-  height: 120px;
-  align-items: center;
-  position: relative;
-  left: 3%;
-  float: left;
-
-  display: block;
-}
-
-.imginformation {
-  position: absolute;
-  left: 140px;
-  width: 60%;
-  height: 120px;
-}
-.namesytle {
-  position: absolute;
-  top: 2px;
-  width: 100%;
-  left: 12px;
-  text-align: left;
-  font-size: 20px;
-}
-.viceinformation {
-  position: absolute;
-  top: 72px;
-  width: 100%;
-  right: 20px;
-  text-align: right;
-  font-size: 10px;
-  color: #999;
+.card >>> .el-card__body {
+  padding: 0px;
 }
 
 .located-button {
   float: right;
-  position: absolute;
-  top: 110px;
-  right: 5px;
   height: 24px;
   width: 150px;
   text-align: center;
   padding: 2px;
 }
 
-
-
-.col1{
-  
+.col1 {
   /*font-weight:bolder;*/
   text-align: left;
   font-size: 16px;
-  
 }
-.col2{
+.col2 {
   text-align: left;
   font-size: 16px;
-  
-
 }
-.row1{
-  border-bottom:1px solid rgb(216, 215, 215) ;
+.row1 {
+  border-bottom: 1px solid rgb(216, 215, 215);
   margin-bottom: 6px;
   padding-bottom: 5px;
-  
 }
 .clearfix:before,
 .clearfix:after {

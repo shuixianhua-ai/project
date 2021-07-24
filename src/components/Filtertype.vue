@@ -32,14 +32,14 @@
 
 <script>
 const TypeOptions = [
-  { imgSrc: require("../assets/earthquake.png"), name: "Earthquake" },
-  { imgSrc: require("../assets/forestfire.png"), name: "Fire" },
-  { imgSrc: require("../assets/crumble.png"), name: "Landslide" },
-  { imgSrc: require("../assets/snow.png"), name: "Snow" },
-  { imgSrc: require("../assets/rainstorm.png"), name: "Rainstorm" },
-  { imgSrc: require("../assets/typhoon.png"), name: "Typhoon" },
-  { imgSrc: require("../assets/vocano.png"), name: "Volcanic eruption" },
-  { imgSrc: require("../assets/oceanwave.png"), name: "Ocean wave" },
+  { imgSrc: require("../assets/icon/earthquake.png"), name: "Earthquake" },
+  { imgSrc: require("../assets/icon/forestfire.png"), name: "Fire" },
+  { imgSrc: require("../assets/icon/crumble.png"), name: "Landslide" },
+  { imgSrc: require("../assets/icon/snow.png"), name: "Snow" },
+  { imgSrc: require("../assets/icon/rainstorm.png"), name: "Rainstorm" },
+  { imgSrc: require("../assets/icon/typhoon.png"), name: "Typhoon" },
+  { imgSrc: require("../assets/icon/vocano.png"), name: "Volcanic eruption" },
+  { imgSrc: require("../assets/icon/oceanwave.png"), name: "Ocean wave" },
   { imgSrc: "", name: "other" },
 ];
 export default {
@@ -69,7 +69,6 @@ export default {
 
       //传值
       this.$emit("filterSelection", this.checkedTypes);
-      console.log(Object.keys(this.Types).length);
     },
   },
 };

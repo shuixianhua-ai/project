@@ -24,6 +24,7 @@ export default {
       flag: true,
       map: {}, // map 主变量属性
       draw: {},
+      getUrl: "http://localhost:11000/images/GetImages",
       imgList: [
         {
           id: "1",
@@ -253,7 +254,6 @@ export default {
 
       // 该影像已添加至地图，且包围盒存在
       // if (modiIndex >= 0 && self.map.getLayer(boxLayer)) {
-      //   console.log("$$$$$$$$$$$$$$$$$$$$$$$" + id);
       //   console.log(result.features[0].geometry.coordinates[0]);
       //   var result = self.map.queryRenderedFeatures(null, {
       //     layers: [boxLayer], //.filter((layer) => {this.map.getLayer(layer);}),
@@ -262,6 +262,13 @@ export default {
       //     center: result.features[0].geometry.coordinates[0],
       //   });
       // }
+    });
+
+    bus.$on("LocToDisaster", function (loc, id) {
+      console.log(id + "=======================");
+      self.map.flyTo({
+        center: loc,
+      });
     });
   },
   methods: {
@@ -323,15 +330,115 @@ export default {
         //   },
         // });
 
+        // 从数据库中搜索得到包围盒
+
+        //let url = "http://localhost:11000/images/GetImages";
+        axios({
+          url: that.getUrl,
+          method: "get",
+        }).then((res) => {
+          var length = res.data.data.length; // 从数据库共返回了几条记录
+          //console.log("length:  " + length);
+
+          var geoText = JSON.stringify(res.data.data[0].geoJson);
+          var geoText2 = JSON.parse(geoText);
+          var geoJson = eval("(" + geoText2 + ")");
+          var geo = geoJson.coordinates[0]; // coordinates
+          //console.log(geo); // 第一个包围盒
+
+          that.map.addLayer({
+            id: "boundingbox2",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: {
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    geometry: {
+                      type: "Polygon",
+                      coordinates: geo,
+                    },
+                  },
+                ],
+              },
+            },
+            layout: {},
+            paint: {
+              "line-color": "#088",
+              "line-width": 1.0,
+            },
+          });
+        });
+
+        axios.get("/static/data/geoJson.json").then((res) => {
+          var geoJson = eval("(" + res.data.geoJson + ")"); //eval("(" + res.data.geoJson + ")"); // text转换为json格式
+          var geo = geoJson.coordinates[0];
+
+          that.map.addLayer({
+            id: "boundingbox1",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: {
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    geometry: {
+                      type: "Polygon",
+                      coordinates: geo,
+                    },
+                  },
+                ],
+              },
+            },
+            layout: {},
+            paint: {
+              "line-color": "#088",
+              "line-width": 1.0,
+            },
+          });
+        });
+
+        // 读取数据库内的包围盒 geojson文件，加载要素
+        // axios.get("/static/data/boundingbox.json").then((res) => {
+        //   that.map.addLayer({
+        //     id: "boundingbox",
+        //     type: "line",
+        //     source: {
+        //       type: "geojson",
+        //       data: {
+        //         type: "FeatureCollection",
+        //         features: [
+        //           {
+        //             type: "Feature",
+        //             geometry: {
+        //               type: "Polygon",
+        //               coordinates: res.data.coordinates,
+        //             },
+        //           },
+        //         ],
+        //       },
+        //     },
+        //     layout: {},
+        //     paint: {
+        //       "line-color": "#088",
+        //       "line-width": 1.0,
+        //     },
+        //   });
+        // });
+
         // 灾害 - 点图层，多种图标
         // 地震
         that.map.loadImage(
-          require("../assets/earthquake.png"),
+          require("../assets/icon/earthquake.png"),
           (error, image) => {
             if (error) throw error;
             that.map.addImage("earthquake", image);
 
-            axios.get("/static/data/points.json").then((res) => {
+            axios.get("/static/data/earthquake_points.json").then((res) => {
               that.map.addLayer({
                 id: "points",
                 type: "symbol",
@@ -348,16 +455,16 @@ export default {
           }
         );
 
-        // 森林大火
+        // 大火
         that.map.loadImage(
-          require("../assets/forestfire.png"),
+          require("../assets/icon/forestfire.png"),
           (error, image) => {
             if (error) throw error;
             that.map.addImage("forestfire", image);
 
-            axios.get("/static/data/forestfire_points.json").then((res) => {
+            axios.get("/static/data/fire_points.json").then((res) => {
               that.map.addLayer({
-                id: "forestfire_points",
+                id: "fire_points",
                 type: "symbol",
                 source: {
                   type: "geojson",
@@ -374,7 +481,7 @@ export default {
 
         // 暴雨
         that.map.loadImage(
-          require("../assets/rainstorm.png"),
+          require("../assets/icon/rainstorm.png"),
           (error, image) => {
             if (error) throw error;
             that.map.addImage("rainstorm", image);
@@ -400,23 +507,6 @@ export default {
         //   id: "testImage",
         //   type: "raster",
         //   source: "testImage",
-        // });
-
-        // 读取geojson文件，加载要素
-        // axios.get("/static/data/boundingbox.json").then((res) => {
-        //   that.map.addLayer({
-        //     id: "boundingbox",
-        //     type: "line",
-        //     source: {
-        //       type: "geojson",
-        //       data: res.data,
-        //     },
-        //     layout: {},
-        //     paint: {
-        //       "line-color": "#088",
-        //       "line-width": 1.0,
-        //     },
-        //   });
         // });
 
         // that.map.addLayer({

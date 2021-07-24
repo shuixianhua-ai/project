@@ -65,14 +65,14 @@ export default {
 };
 
 // 前端读数据
-let url = "http://localhost:11000/disaster/disaster/get/?id=111";
+// let url = "http://localhost:11000/disaster/disaster/get/?id=111";
 
-axios({
-  url: url,
-  method: "get",
-}).then((res) => {
-  console.log(res.data);
-});
+// axios({
+//   url: url,
+//   method: "get",
+// }).then((res) => {
+//   console.log(res.data);
+// });
 </script>
 
 <style>

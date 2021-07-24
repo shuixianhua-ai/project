@@ -19,9 +19,9 @@
     >
       <el-row>
         <el-checkbox v-for="sensor in Options" :label="sensor" :key="sensor">
-          <el-col :span="6"
-            ><div id="sensor-block">{{ sensor }}</div></el-col
-          >
+          <el-col :span="6">
+            <div id="sensor-block" :span="6">{{ sensor }}</div>
+          </el-col>
         </el-checkbox>
       </el-row>
     </el-checkbox-group>

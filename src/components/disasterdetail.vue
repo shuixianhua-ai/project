@@ -17,22 +17,8 @@
       </el-table-column>
       <el-table-column prop="disaster" label="disaster"> </el-table-column>
     </el-table>
-    <div style="margin: 30px 0"></div>
-    <el-button size="small" round icon="el-icon-upload2">Upload</el-button>
-    <el-button
-      size="small"
-      round
-      @click="dialogVisible = true"
-      icon="el-icon-reading"
-      >Display</el-button
-    >
-    <el-button
-      size="small"
-      round
-      icon="el-icon-download"
-      @click="downloadClick(multipleTable)"
-      >Download</el-button
-    >
+    <div style="margin: 15px 0"></div>
+    <el-button round @click="dialogVisible = true">Display</el-button>
     <el-dialog
       title="Activation: 719"
       :visible.sync="dialogVisible"
@@ -50,43 +36,39 @@
         @tab-click="handleClick"
       >
         <el-tab-pane label="Overview">
-          <el-carousel
-            type="card"
-            arrow="always"
-            :loop="false"
-            :initial-index="0"
-            indicator-position="outside"
-            :autoplay="false"
-            :span="24"
-            @change="getChange"
-          >
-            <el-carousel-item
-              v-for="(items, index) in multipleTable"
-              :key="index"
-            >
-              <el-row>
-                <el-col :span="24">
-                  <el-card
-                    :body-style="{ padding: '0px' }"
-                    class="card"
-                    align="center"
-                  >
-                    <img
-                      :src="
-                        require('../assets/raster/img' + (index + 1) + '.jpg')
-                      "
-                      class="image"
-                    />
-                  </el-card>
-                </el-col>
-              </el-row>
-            </el-carousel-item>
-          </el-carousel>
-          <el-card :body-style="{ padding: '0px' }">
-            <span v-show="desOfCarousel.length > 0">{{ desOfCarousel }}</span>
+          <el-card :body-style="{ padding: '5px' }" align="middle">
+            <img src="../assets/raster/img1.jpg" class="image" />
+          </el-card>
+          <div style="padding: 10px" />
+          <el-card :body-style="{ padding: '15px' }" align="left">
+            <span>
+              <div class="text">
+                Destroyed structures observed nearby the blast epicenter as of 7
+                July 2021; Widespread damage and damaged roofs observed within a
+                1 km radius zone from the blast epicenter as of 7 July 2021; No
+                damaged roofs were observed beyond a 2 km radius from the blast
+                epicenter as of 7 & 9 July 2021.
+              </div>
+            </span>
           </el-card>
         </el-tab-pane>
         <el-tab-pane label="Sources">
+          <!-- <el-card :body-style="{ padding: '5px' }">
+            <el-col :span="24">
+              <div class="grid-content bg-purple">07 Jul 2021, 04:11:07</div>
+            </el-col>
+            <el-col :span="24">
+              <div class="grid-content bg-purple-light">
+                Agency: CNES Satellite: PLEIADES_1B Instrument: PHR1B Mode: PX
+              </div>
+            </el-col>
+            <el-col :span="24">
+              <div class="grid-content bg-purple-light">
+                Includes Pleiades material © CNES (2021), Distribution Airbus
+                DS.
+              </div>
+            </el-col>
+          </el-card> -->
           <el-table :data="multipleTable" style="width: 100%">
             <el-table-column prop="date" label="date" width="120">
             </el-table-column>
@@ -116,7 +98,6 @@ export default {
       activeName1: "Overview",
       dialogVisible: false,
       multipleTable: [],
-      desOfCarousel: [],
       tableData: [
         {
           id: "1",
@@ -125,8 +106,6 @@ export default {
           disaster: "Forest Fire",
           sponsor: "AAA",
           responder: "BBB",
-          description:
-            "Product1 test—— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
         },
         {
           id: "2",
@@ -135,7 +114,6 @@ export default {
           disaster: "Flood",
           sponsor: "AAA",
           responder: "BBB",
-          description: "Product2 ……",
         },
         {
           id: "3",
@@ -144,7 +122,6 @@ export default {
           disaster: "Typhoon",
           sponsor: "AAA",
           responder: "BBB",
-          description: "Product3 ……",
         },
         {
           id: "4",
@@ -153,26 +130,13 @@ export default {
           disaster: "Snow storm",
           sponsor: "AAA",
           responder: "BBB",
-          description: "Product4 ……",
         },
       ],
     };
   },
-  created() {
-    console.log(this.desOfCarousel.length);
-  },
-  watch: {
-    multipleTable(o, n) {
-      // console.log(o[0].description);
-      if (o.length > 0) this.desOfCarousel = o[0].description;
-      else this.desOfCarousel = [];
-    },
-    deep: true,
-    immediate: true,
-  },
   methods: {
     handleClick(tab, event) {
-      // console.log(tab, event);
+      console.log(tab, event);
     },
     handleClose(done) {
       this.$confirm("Sure close?")
@@ -183,29 +147,19 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleTable = val;
-      // console.log(this.multipleTable);
+      console.log(this.multipleTable);
     },
-    getChange(pre, next) {
-      this.desOfCarousel = this.multipleTable[pre].description;
-      // console.log(pre+ "  " +next);
-      console.log(this.desOfCarousel);
-    },
-    downloadClick(mt) {
-      for (var i = 0; i < mt.length; i++) {
-        var link = document.createElement("a");
-        link.download = mt[i].name;
-        link.href = require("../assets/raster/img" + (i + 1) + ".jpg");
-        link.click();
-        link.remove();
-      }
-    },
+    // itsmTableCountSelect() {
+    //   this.dialogVisible = true;
+
+    // },
   },
 };
 </script>
 
 <style scoped>
 .image {
-  width: 100%;
+  width: 50%;
   display: block;
 }
 .el-col {
