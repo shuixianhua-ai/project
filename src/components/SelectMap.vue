@@ -3,6 +3,7 @@
     <div class="map-overlay top" position="top-right">
       <div class="map-overlay-inner">
         <fieldset>
+          <label>{{msg}}</label>
           <label>Select Data to Download</label>
           <select id="layer" name="layer">
             <option value="water">Water</option>
@@ -37,7 +38,7 @@ export default {
   name: "selectFrame",
   data() {
     return {
-      msg: "Disaster Response Information & Display",
+      msg: "Activation1 -- China",
     };
   },
 };

@@ -69,6 +69,7 @@ export default {
 
       //传值
       this.$emit("filterSelection", this.checkedTypes);
+      console.log(Object.keys(this.Types).length);
     },
   },
 };

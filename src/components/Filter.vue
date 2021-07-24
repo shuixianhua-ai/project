@@ -129,7 +129,7 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "LANDSAT",
-          date: "2020-01-20",
+          date: "2019-12-29,13:00:54",
           imgDisplay: false,
           boundingBox: false,
           isdisplay: false,
@@ -140,7 +140,7 @@ export default {
           sensor: "Optical",
           resolution: "Medium",
           satellite: "GF",
-          date: "2019-12-29",
+          date: "2020-01-01,01:00:03",
           imgDisplay: false,
           boundingBox: false,
           isdisplay: false,
@@ -151,7 +151,7 @@ export default {
           sensor: "Radar",
           resolution: "Low",
           satellite: "LANDSAT",
-          date: "2020-01-08",
+          date: "2020-01-08,17:09:56",
           imgDisplay: false,
           boundingBox: false,
           isdisplay: false,
@@ -162,7 +162,7 @@ export default {
           sensor: "Optical",
           resolution: "Very Low",
           satellite: "SENTINEL",
-          date: "2020-01-13",
+          date: "2020-01-13,00:08:48",
           imgDisplay: false,
           boundingBox: false,
           isdisplay: false,
@@ -173,7 +173,7 @@ export default {
           sensor: "Radar",
           resolution: "Very High",
           satellite: "TENDEM",
-          date: "2020-01-01",
+          date: "2020-01-20,12:00:00",
           imgDisplay: false,
           boundingBox: false,
           isdisplay: false,
@@ -264,8 +264,11 @@ export default {
           var year = this.imgList[i].date.substr(0, 4);
           var month = this.imgList[i].date.substr(5, 2);
           var date = this.imgList[i].date.substr(8, 2);
-          var datanumber = new Date(Date.UTC(year, month - 1, date));
-          console.log(date);
+          var hour=this.imgList[i].date.substr(11,2);
+          var min=this.imgList[i].date.substr(14,2);
+          var s=this.imgList[i].date.substr(17,2);
+          var datanumber = new Date(Date.UTC(year, month - 1, date,hour,min,s));
+          //console.log(min);
           console.log(this.selectionTime2);
 
           if (

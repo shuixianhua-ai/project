@@ -14,26 +14,30 @@
     </div>
     <div>
       <el-row
-        v-for="(img, index) in imgList"
+        v-for="(dis, index) in DisasterList"
         :key="index"
-        v-show="img.isdisplay"
+        v-show="dis.isdisplay"
       >
         <el-col>
           <el-divider></el-divider>
           <div>
-            <el-card shadow="hover" class="imgfix" @click.native="clickinfo(img.id)">
+            <el-card
+              shadow="hover"
+              class="imgfix"
+              @click.native="clickinfo(dis.id)"
+            >
               <img
-                :src="require('../assets/disaster-img/img' + img.id + '.png')"
+                :src="require('../assets/disaster-img/img' + dis.id + '.png')"
                 class="image"
                 height="70px"
               />
               <div style="font-size: 5px"></div>
             </el-card>
             <div class="imginformation">
-              <div id="disastername" class="namesytle">{{ img.name }}</div>
+              <div id="disastername" class="namesytle">{{ dis.name }}</div>
               <div class="viceinformation">
-                <h id="disaster-date">time: {{ img.date }} </h><br />
-                <h id="disaster-type">type: {{ img.type }} </h>
+                <h id="disaster-date">time: {{ dis.date }} </h><br />
+                <h id="disaster-type">type: {{ dis.type }} </h>
               </div>
               <!--el-button
               size = "mini"
@@ -41,7 +45,11 @@
               icon = "el-icon-info"
               circle plain
               ></el-button>-->
-              <el-button plain class="located-button" type="primary"
+              <el-button
+                plain
+                class="located-button"
+                type="primary"
+                v-on:click="sendLocFlag(dis.id)"
                 >Locate on map</el-button
               >
             </div>
@@ -50,58 +58,46 @@
       </el-row>
     </div>
 
-
-
-
-    <el-dialog
-      
-      :visible.sync="dialogVisible"
-      width="70%"
-      
-    >
-      
+    <el-dialog :visible.sync="dialogVisible" width="55%">
       <div style="margin: 15px 0"></div>
-      <el-tabs
+      <el-tabs type="border-card">
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Name:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].name }}</el-col>
+        </el-row>
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Type of Event:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].type }}</el-col>
+        </el-row>
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Location:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].country }}</el-col>
+        </el-row>
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Date:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].date }}</el-col>
+        </el-row>
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Charter Requestor:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].requestor }}</el-col>
+        </el-row>
+        <el-row class="row1">
+          <el-col :span="5" class="col1">Project Management:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].management }}</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="5" class="col1">Description:</el-col>
+          <el-col :span="1" >&ensp;&ensp;</el-col>
+          <el-col :span="18" class="col2">{{ this.DisasterList[Selectedid].description }}</el-col>
+        </el-row>
         
-        type="border-card"
-        
-      >
-        <table>
-          <tbody class="test">
-            <tr >
-              <td class="informationname">Name:</td>
-              <td class="information">{{this.imgList[Selectedid].name}}</td>
-            </tr>
-            
-            <tr>
-              <td class="informationname">Type of Event:</td>
-              <td class="information">{{this.imgList[Selectedid].type}}</td>
-            </tr>
-            
-            <tr>
-              <td class="informationname">Location:</td>
-              <td class="information">{{this.imgList[Selectedid].country}}</td>
-            </tr>
-            <tr>
-              <td class="informationname">Date:</td>
-              <td class="information">{{this.imgList[Selectedid].date}}</td>
-            </tr>
-            <tr>
-              <td class="informationname">Charter Requestor:</td>
-              <td class="information">{{this.imgList[Selectedid].requestor}}</td>
-            </tr>
-            <tr>
-              <td class="informationname">Project Management:</td>
-              <td class="information">{{this.imgList[Selectedid].management}}</td>
-            </tr>
-            <tr>
-              <td class="informationname">Description:</td>
-              <td class="information">{{this.imgList[Selectedid].description}}</td>
-            </tr>
-          </tbody>
-        </table>
       </el-tabs>
-      
     </el-dialog>
   </div>
 </template>
@@ -110,6 +106,7 @@
 import filterModel from "./FilterModel";
 import filterType from "./Filtertype.vue";
 import filterTime from "./Filter-disaster-time.vue";
+import bus from "./eventBus";
 
 export default {
   name: "filterOfPictures",
@@ -118,14 +115,15 @@ export default {
       CollapseActiveNames: [],
       selectionContent: [],
       selectionTime: [],
-      Selectedid:0,
-      dialogVisible:false,
-      imgList: [
+      Selectedid: 0,
+      dialogVisible: false,
+      DisasterList: [
         {
           id: "1",
           name: "Flooding in Switzerland",
           type: "Rainstorm",
           country: "Switzerland",
+          location: [8, 47],
           date: "2021-07-15,18:23:00",
           description:
             "Heavy rainfall has caused severe flooding in parts of Switzerland. Trees have been blown onto roads and rail tracks in Zurich, causing travel chaos for commuters.A warning issued to citizens has stated that several rivers could burst their banks, while some Alpine passes were temporarily closed due to heavy snowfall.More than four centimetres of rain fell on Zurich overnight on Monday 12 July 2021 and over 3.1 centimetres of rain fell in just 10 minutes on nearby Waldegg, according to broadcaster SRF.Officials in the de facto capital, Bern, are preparing for possible flooding by installing floating dams. The country's meteorological services have warned that further rain is forecast, and also urged caution of potential landslides.Authorities near Lake Lucerne, Lake Geneva, and Lake Zurich have also issued alerts for local residents and shipping companies. Lake Lucerne, in particular, is at a very high risk of flooding, warned MeteoSchweiz.",
@@ -142,6 +140,7 @@ export default {
           name: "Chemical factory explosion in Thailand",
           type: "Fire",
           country: "Thailand",
+          location: [102, 15],
           date: "2021-07-06,10:32:00",
           description:
             "An explosion occurred about 03:00 am on 5 July 2021 at the Ming Dih Chemical factory, a factory producing plastic foam and plastic pellets, in Bang Phli district, Samut Prakan province, the outskirts of Thailand's capital.",
@@ -157,6 +156,7 @@ export default {
           name: "Floods and landslides in Ecuador",
           type: "Landslide",
           country: "Ecuador",
+          location: [8, 49],
           date: "2012-03-10,11:30:00",
           description:
             "Heavy rains continued to pour inJocay, Ecuadorthis week, causing flooding across coastal communities. In an official statement from the Ecuadorian government, they announced that at least 20 people were killed and 65 people were severly injured due to flooding withincoastal provinces. 166 homes have been destroyed and 2,823 people have been evacuated from their homes to sheltersand other communities. In February, hundreds of people fled their homes to seek shelter after severe rains caused floods and damaged local crops and produce. Ecuador's National Institute of Meteorology and Hydrologyforecast further heavy rains during the months of March and April.",
@@ -174,6 +174,7 @@ export default {
           name: "Volcanic eruption in Iceland",
           type: "Volcanic eruption",
           country: "Iceland",
+          location: [8, 49],
           date: "2010-04-10,11:00:00",
           description:
             "A volcanic eruption in Iceland spread black smoke and white steam into the air and partly melted a glacier, 700 people have been evacuated. As a consequence of the smoke cloud, most of the european airspace has been progressively closed.",
@@ -191,6 +192,7 @@ export default {
           name: "Earthquake in China",
           type: "Earthquake",
           country: "China",
+          location: [8, 49],
           date: "2021-05-22,00:36:00",
           description:
             "A 7.4-magnitude earthquake struck Northwest China's Qinghai province on 22 May 2021. The quake struck Maduo county of Golog Tibetan autonomous prefecture at 2:04 am.The epicenter was monitored at 34.59 degrees north latitude and 98.34 degrees east longitude and struck at a depth of 17 km. There have been no reports of casualties and house collapses, however highway sections and bridges have collapsed in the quake-hit area making it impassable to vehicles.",
@@ -209,11 +211,17 @@ export default {
       console.log(val);
     },
     clickinfo(id) {
-      this.dialogVisible=true;
-      console.log(this.imgList[id-1].name);
-      this.Selectedid=id-1;
-
+      this.dialogVisible = true;
+      console.log(this.DisasterList[id - 1].name);
+      this.Selectedid = id - 1;
     },
+
+    sendLocFlag(id) {
+      //var index = id.to
+      var loc = this.DisasterList[id - 1].location;
+      bus.$emit("LocToDisaster", loc, id);
+    },
+
     changetype(val) {},
     getSelection(selection) {
       //目前仅针对satellite的filter
@@ -224,21 +232,21 @@ export default {
     },
     queryType() {
       //按type过滤
-      for (var i = 0; i < this.imgList.length; i++) {
+      for (var i = 0; i < this.DisasterList.length; i++) {
         for (var j = 0; j < this.selectionContent.length; j++) {
           console.log(this.selectionContent[j].name);
-          if (this.imgList[i].type == this.selectionContent[j].name) {
-            this.imgList[i].isdisplay_type = true;
+          if (this.DisasterList[i].type == this.selectionContent[j].name) {
+            this.DisasterList[i].isdisplay_type = true;
 
             break;
-          } else this.imgList[i].isdisplay_type = false;
+          } else this.DisasterList[i].isdisplay_type = false;
         }
       }
 
       //按时间过滤
-      for (var i = 0; i < this.imgList.length; i++) {
-        var year = this.imgList[i].date.substr(0, 4);
-        var month = this.imgList[i].date.substr(5, 2);
+      for (var i = 0; i < this.DisasterList.length; i++) {
+        var year = this.DisasterList[i].date.substr(0, 4);
+        var month = this.DisasterList[i].date.substr(5, 2);
         var datanumber = (parseInt(year) - 2000) * 12 + parseInt(month);
         console.log(this.selectionTime);
 
@@ -247,15 +255,15 @@ export default {
             Math.max(this.selectionTime[0], this.selectionTime[1]) &&
           datanumber >= Math.min(this.selectionTime[0], this.selectionTime[1])
         ) {
-          this.imgList[i].isdisplay_time = true;
+          this.DisasterList[i].isdisplay_time = true;
         } else {
-          this.imgList[i].isdisplay_time = false;
+          this.DisasterList[i].isdisplay_time = false;
         }
 
-        this.imgList[i].isdisplay =
-          this.imgList[i].isdisplay_type &&
-          this.imgList[i].isdisplay_time &&
-          this.imgList[i].isdisplay_country;
+        this.DisasterList[i].isdisplay =
+          this.DisasterList[i].isdisplay_type &&
+          this.DisasterList[i].isdisplay_time &&
+          this.DisasterList[i].isdisplay_country;
       }
     },
   },
@@ -319,23 +327,26 @@ export default {
   padding: 2px;
 }
 
-.informationname{
-  float: left;
+
+
+.col1{
+  
+  /*font-weight:bolder;*/
   text-align: left;
-  width:150px;
-  font-size:16px;
-  vertical-align:middle; 
-  line-height:20px;
+  font-size: 16px;
+  
 }
-.information{
-  text-align: center;
-  font-size:16px;
-  vertical-align:middle; 
-  line-height:20px;
- 
+.col2{
+  text-align: left;
+  font-size: 16px;
+  
+
 }
-.test{
-  border-top-color: black;
+.row1{
+  border-bottom:1px solid rgb(216, 215, 215) ;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  
 }
 .clearfix:before,
 .clearfix:after {
