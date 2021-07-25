@@ -191,8 +191,8 @@ export default {
       }
     });
 
-    bus.$on("MainpageBox", function (id, flag) {
-      var modiIndex = self.imgList.findIndex((v) => {
+    bus.$on("MainpageBox", function (imageList) {
+      /*var modiIndex = self.imgList.findIndex((v) => {
         return v.id == id; //id
       });
       if (modiIndex < 0) {
@@ -204,14 +204,23 @@ export default {
       } else {
         self.imgList[modiIndex].boundingBox = flag;
       }
-
+*/
       // 2. 遍历ImgBox，渲染至地图
-      for (var i = 0; i < self.imgList.length; i++) {
-        var tempId = "boxJson" + (i + 1);
-        var tempRoute = "/static/boundingBox/imgBox" + (i + 1) + ".json";
+      var layers = self.map.getStyle().layers;
+/*
+    var layerIds = layers.map(function (layer) {
+    return layer.id;});
+    console.log(layerIds);
+    */
+      for (let i = 0; i < imageList.length; i++) {
+        let tempId = "boxJson" + (i + 1);
+        let tempRoute = "/static/boundingBox/imgBox" + (i + 1) + ".json";
 
-        if (self.imgList[i].boundingBox == true) {
+        if (imageList[i].boundingBox == true) {
+          //console.log(tempId);
+          //console.log((!self.map.getLayer(tempId))+tempId);
           if (!self.map.getLayer(tempId)) {
+            //console.log(tempId+"1");
             axios.get(tempRoute).then((res) => {
               self.map.addLayer({
                 id: tempId,
@@ -220,21 +229,24 @@ export default {
                   type: "geojson",
                   data: res.data,
                 },
-                layout: {},
+                layout: {
+                  // 'visibility': 'visible'
+            },
                 paint: {
                   "line-color": "#088",
                   "line-width": 1.0,
-                },
+                }
               });
             });
           } else {
-            map.setLayoutProperty(
+            //console.log(tempId+"2");
+            self.map.setLayoutProperty(
               self.map.getLayer(tempId),
               "visibility",
               "visible"
             );
           }
-        } else if (self.imgList[i].boundingBox == false) {
+        } else if (imageList[i].boundingBox == false) {
           if (self.map.getLayer(tempId)) {
             self.map.removeLayer(tempId);
             self.map.removeSource(tempId);

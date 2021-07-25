@@ -124,7 +124,7 @@ export default {
       imgList: [
         //resolution 1-5分别对应very low,low,medium,high,very high
         {
-          id: "1",
+          id: 0,
           name: "img1",
           sensor: "Optical",
           resolution: "Medium",
@@ -135,7 +135,7 @@ export default {
           isdisplay: false,
         },
         {
-          id: "2",
+          id: 1,
           name: "img2",
           sensor: "Optical",
           resolution: "Medium",
@@ -146,7 +146,7 @@ export default {
           isdisplay: false,
         },
         {
-          id: "3",
+          id: 2,
           name: "img3",
           sensor: "Radar",
           resolution: "Low",
@@ -157,7 +157,7 @@ export default {
           isdisplay: false,
         },
         {
-          id: "4",
+          id: 3,
           name: "img4",
           sensor: "Optical",
           resolution: "Very Low",
@@ -168,7 +168,7 @@ export default {
           isdisplay: false,
         },
         {
-          id: "5",
+          id: 4,
           name: "img5",
           sensor: "Radar",
           resolution: "Very High",
@@ -217,7 +217,7 @@ export default {
     },
     sendBoxFlag(id) {
       this.imgList[id].boundingBox = !this.imgList[id].boundingBox;
-      bus.$emit("MainpageBox", id, this.imgList[id].boundingBox);
+      bus.$emit("MainpageBox", this.imgList);
     },
     sendLocFlag(id) {
       bus.$emit("MainpageLoc", id);
