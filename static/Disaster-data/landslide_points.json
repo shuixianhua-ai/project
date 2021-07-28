@@ -1,0 +1,18 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "description": "<strong>Rainstorms and landslides in Ecuador</strong><p>Heavy rains continued to pour inJocay, Ecuadorthis week, causing flooding across coastal communities. At least 20 people were killed and 65 people were severly injured due to flooding withincoastal provinces. 166 homes have been destroyed.</p>"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -79,
+                    0.37
+                ]
+            }
+        }
+    ]
+}

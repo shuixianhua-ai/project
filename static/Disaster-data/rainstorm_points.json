@@ -1,0 +1,31 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "description": "<strong>A Torrent in Indonesia's East Nusa Tenggara province</strong><p>As of the evening of April 5, 2021, 128 people have died and 72 people are missing, 8424 people have taken refuge and 2683 people have been affected by the disaster.</p>"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110,
+                    0
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "description": "<strong>Flooding in Switzerland</strong><p>Heavy rainfall has caused severe flooding in parts of Switzerland. Trees have been blown onto roads and rail tracks in Zurich, causing travel chaos for commuters.A warning issued to citizens has stated that several rivers could burst their banks</p>"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    8,
+                    47
+                ]
+            }
+        }
+    ]
+}
