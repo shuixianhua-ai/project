@@ -1,7 +1,7 @@
 <template>
   <div class="top-middle-cmp">
     <div class="chart-name">
-      设备完好率月趋势
+      Daily Twitter Heat Change
       <dv-decoration-3 style="width:200px;height:20px;" />
     </div>
     <dv-charts :option="option" />
@@ -15,7 +15,7 @@ export default {
     return {
       option: {
         legend: {
-          data: ['设备完好率'],
+          data: ['twitter heat'],
           textStyle: {
             fill: '#fff'
           }
@@ -74,7 +74,7 @@ export default {
               99.15, 99.45, 99.64, 99.89
             ],
             type: 'line',
-            name: '设备完好率',
+            name: 'twitter heat',
             smooth: true,
             lineArea: {
               show: true,

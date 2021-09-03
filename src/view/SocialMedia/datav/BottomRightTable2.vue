@@ -1,8 +1,8 @@
 <template>
   <div class="bottom-right-table-2">
-    <dv-border-box-6>
+    <dv-border-box-6 class="box">
       <div class="table-name">
-        <img src="./img/icon2.png" />故障设备排行榜
+        <img src="./img/icon2.png" />Heated User Rank
       </div>
 
       <dv-scroll-board :config="config" />
@@ -17,12 +17,12 @@ export default {
     return {
       config: {
         data: [
-          ['液晶显示器', '月累计：4起'],
-          ['收费键盘', '月累计：3起'],
-          ['车牌识别仪', '月累计：3起'],
-          ['自动栏杆机', '月累计：3起'],
-          ['称重仪表盘', '月累计：2起'],
-          ['门架机柜空调', '月累计：1起']
+          ['User1', 'Number of Twitter：56'],
+          ['User2', 'Number of Twitter：56'],
+          ['User3', 'Number of Twitter：56'],
+          ['User4', 'Number of Twitter：56'],
+          ['User5', 'Number of Twitter：56'],
+          ['User6', 'Number of Twitter：56']
         ],
         index: true,
         columnWidth: [30, 100],
@@ -37,7 +37,7 @@ export default {
 
 <style lang="less">
 .bottom-right-table-2 {
-  width: calc(~"25% + 10px");
+  width: calc(~"50% + 10px");
   height: 100%;
   margin: 0 -5px;
 
@@ -59,7 +59,9 @@ export default {
       margin-right: 5px;
     }
   }
-
+  .box{
+    width: calc(~"100% - 20px");
+  }
   .dv-scroll-board {
     height: calc(~"100% - 60px");
   }

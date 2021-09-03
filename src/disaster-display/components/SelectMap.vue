@@ -129,8 +129,7 @@ export default {
   mounted() {
     var self = this;
     bus.$on("TitleOfDisaster", function (title, id) {
-      console.log(self.msg);
-      self.msg = "Activation - " + id + "   " + title;
+      self.msg = title;
     });
   },
   methods: {
@@ -173,8 +172,9 @@ export default {
 }
 
 .map-overlay .map-overlay-inner {
-  background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: #2d2d2d;
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   border-radius: 3px;
   padding: 10px;
   margin-bottom: 10px;
@@ -225,12 +225,17 @@ export default {
   font-size: 16px;
 }
 .row1 {
-  border-bottom: 1px solid rgb(216, 215, 215);
+  border-bottom: 1px solid rgb(224, 224, 224);
   margin-bottom: 6px;
   padding-bottom: 5px;
 }
 .title {
   font-size: 14px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 3px 1px rgba(255, 255, 255, 0.5);
+}
+/* 下拉菜单样式 */
+select {
+  background-color: #2d2d2d;
+  color: #ffffff;
 }
 </style>

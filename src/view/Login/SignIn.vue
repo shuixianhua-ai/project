@@ -91,7 +91,7 @@ export default {
         if (valid) {
           this.$axios({
             method: 'get',
-            url: 'http://127.0.0.1:11000/users/login',
+            url: 'http://116.62.228.138:10003/users/login',
             params: {
               mailAddr: this.signInForm.email,
               pwd: this.signInForm.password

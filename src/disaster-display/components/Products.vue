@@ -8,11 +8,6 @@
     >
       <el-table-column type="selection" align="center" width="55">
       </el-table-column>
-      <!-- <el-table-column
-        prop="date"
-        label="date"
-        width="120">
-      </el-table-column> -->
       <el-table-column prop="name" label="product" width="120">
       </el-table-column>
       <el-table-column prop="disaster" label="disaster"> </el-table-column>
@@ -95,7 +90,7 @@
             <el-table-column prop="disaster" label="disaster">
             </el-table-column>
             <el-table-column prop="sponsor" label="sponsor"> </el-table-column>
-            <el-table-column prop="responder" label="responder">
+            <el-table-column prop="producer" label="producer">
             </el-table-column>
           </el-table>
         </el-tab-pane>
@@ -124,10 +119,11 @@ export default {
           date: "2016-05-02",
           name: "Product1",
           disaster: "Forest Fire",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor:
+            "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+          producer: "China Group on Earth Observations(GEO)",
           description:
-            "Product1 test—— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
+            "Product1 —— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
         },
         {
           id: "2",
@@ -135,8 +131,9 @@ export default {
           date: "2016-07-04",
           name: "Product2",
           disaster: "Flood",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor:
+            "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+          producer: "China Group on Earth Observations(GEO)",
           description: "Product2 ……",
         },
         {
@@ -145,8 +142,8 @@ export default {
           date: "2016-08-01",
           name: "Product3",
           disaster: "Typhoon",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor: "UNITAR on behalf of UNOCHA",
+          producer: "China Group on Earth Observations(GEO)",
           description: "Product3 ……",
         },
         {
@@ -155,8 +152,8 @@ export default {
           date: "2016-12-03",
           name: "Product4",
           disaster: "Snow storm",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor: "UNITAR on behalf of UNOCHA",
+          producer: "China Group on Earth Observations(GEO)",
           description: "Product4 ……",
         },
       ],

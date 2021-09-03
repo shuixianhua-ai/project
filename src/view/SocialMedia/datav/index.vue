@@ -2,12 +2,15 @@
   <div id="data-view">
       <div class="main-header">
         <div class="mh-left">GIS2018</div>
-        <div class="mh-middle">舆情数据大屏</div>
+        <div class="mh-middle">Social Media Data Screen</div>
         <div class="mh-right">
           <dv-border-box-2
             style="width: 120px; height: 50px; line-height: 50px; text-align:center;margin-left:200px;"
           >
-            设备档案馆
+          <div @click="goOff()">
+              return
+          </div>
+
           </dv-border-box-2>
         </div>
       </div>
@@ -29,8 +32,7 @@
           <div class="bottom-right-container">
             <Bottom-Right-Table-1 />
             <Bottom-Right-Table-2 />
-            <Bottom-Right-Table-3 />
-            <Bottom-Right-Table-4 />
+
           </div>
         </div>
       </dv-border-box-1>
@@ -65,6 +67,11 @@ export default {
   },
   data () {
     return {}
+  },
+  methods: {
+    goOff () {
+      this.$router.go(-1)
+    }
   }
 }
 </script>
@@ -128,6 +135,7 @@ export default {
 
     .top-left-cmp, .bottom-left-container {
       width: 32%;
+      height: 100%
     }
 
     .top-middle-cmp, .top-right-cmp {
@@ -138,6 +146,7 @@ export default {
       position: relative;
 
       .border-box-content {
+        padding: 20px;
         display: flex;
       }
 

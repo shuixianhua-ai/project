@@ -1,110 +1,170 @@
 <template>
   <div class="mainPage">
-
     <div><h1></h1></div>
-   <Map></Map>
-  <!-- <div>
-    <h2>content</h2>
-    <h2>content</h2>
-    <h2>content</h2>
-    <h2>content</h2>
-  </div> -->
-  <el-container>
+   <div><Map></Map></div>
+   <el-row :gutter="20">
+    <el-col :span="18">
+      <div class="grid-content bg-purple">
 
       <!-- Disasters -->
-      <el-header>
         <el-row class="row-header" type="flex" justify="center">
           <el-col :span="20">
-            <h1>Type of Disasters</h1>
+            <h1>Disasters</h1>
           </el-col>
         </el-row>
-      </el-header>
 
-      <el-main>
-        <el-row  type="flex" justify="center">
-          <el-col :span="20">
-            <el-card class="box-card" shadow="never" v-for="(item,index) in TypeOfDisasters" :key="index">
-              <h2>{{index+1}}</h2>
-              <h2>{{item}}</h2>
-              <el-botton size="small" type="text">View details >></el-botton>
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                  <router-link :to="{path:'/DisasterDisplay',query:{id:1}}">
+                    Earthquake
+                  <img src="../../assets/pictures/MainPage-img/Earthquake.jpg" class="image">
+                </router-link>
+              </div>
             </el-card>
-          </el-col>
-        </el-row>
-      </el-main>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'2'}}">
+                    Rainstorm
+                    <img src="../../assets/pictures/MainPage-img/Rainstorm.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'3'}}">
+                    Landslide
+                    <img src="../../assets/pictures/MainPage-img/Landslide.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'4'}}">
+                    Snow
+                    <img src="../../assets/pictures/MainPage-img/Snow.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'5'}}">
+                    Fire
+                    <img src="../../assets/pictures/MainPage-img/Fire.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'6'}}">
+                    Typhoon
+                    <img src="../../assets/pictures/MainPage-img/Typhoon.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'7'}}">
+                    Volcanic Eruption
+                    <img src="../../assets/pictures/MainPage-img/VolcanicEruption.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'8'}}">
+                    Ocean Wave
+                    <img src="../../assets/pictures/MainPage-img/OceanWave.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+
+            <el-card :body-style="{ padding: '0px' }">
+              <div style="padding: 14px;">
+                <router-link :to="{path:'/DisasterDisplay',query:{id:'9'}}">
+                    Other
+                    <img src="../../assets/pictures/MainPage-img/Other.jpg" class="image">
+                </router-link>
+              </div>
+            </el-card>
+    </div>
+  </el-col>
 
       <!-- News -->
-      <el-header>
+  <el-col :span="6">
+    <div class="grid-content bg-purple">
+
         <el-row class="row-header" type="flex" justify="center">
           <el-col :span="20">
             <h1>Latest News</h1>
           </el-col>
         </el-row>
-      </el-header>
 
-      <el-main>
-        <el-row  type="flex" justify="center">
-          <el-col :span="20">
-            <el-card class="box-card" shadow="never" v-for="(item,index) in LatestNews" :key="index">
-              <h2>{{index+1}}</h2>
-              <h2>{{item}}</h2>
-              <el-botton size="small" type="text">View details >></el-botton>
-            </el-card>
-          </el-col>
-        </el-row>
-      </el-main>
+      <div v-for="item in newsArray" :key="item" class="article-title">
+        
+         <h3 class="asset-title content">
+          <router-link target="_blank" :to="{path:'/NewsDisplay',query:{id: newsArray.indexOf(item)}}">
+              {{item.title}}
+          </router-link>
+        </h3>
 
-      <el-footer>
-        <el-row class="row-footer" type="flex" justify="center">
-          <el-col :span="20">
-            <h1>{{Footer}}</h1>
-          </el-col>
-        </el-row>
-      </el-footer>
-    </el-container>
+        <h4 class="asset-title-date content">
+          {{item.postTime}}
+        </h4>
+        
+      </div>
+  </div>
+</el-col>
+  </el-row>
+
+  <Footer></Footer>
+  <!-- <div><Hello></Hello></div> -->
+
   </div>
 </template>
 
 <script>
+import Response from './Response'
 import Map from './Map'
+import Footer from '../../common/footer.vue'
+import Hello from './hello.vue'
+let storage = window.localStorage
 export default {
-  components: {Map},
+  components: {Map, Response,Footer, Hello},
   name: 'HelloWorld',
   data () {
     return {
-      headings: [
-        '1heading',
-        '2heading',
-        '3heading',
-        '4heading',
-        '5heading',
-        '6heading'
-      ],
-      TypeOfDisasters: [
-        'Earthquake',
-        'Flood',
-        'Volcano',
-        'Landslides',
-        'Hurricane',
-        'tsunami'
-      ],
-      LatestNews: [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6'
-      ],
-      Footer: 'Contact Us:xxx'
+      msg: 'msg test.',
+      type: storage['type'],
+      currentDate: new Date(),
+      newsArray: []
     }
+  },
+  mounted () {
+    this.$axios({
+      method: 'get',
+      url: 'http://116.62.228.138:10003/news/articleGetAll'
+    }).then((res) => {
+      // console.log(newsArray)
+      console.log(res.data.data)
+      // var result = res.data
+      this.newsArray = res.data.data
+      console.log(this.newsArray)
+      // console.log(storage)
+    })
   }
-
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1, h2, p{
   font-weight: normal;
   font-family: Arial, Helvetica, sans-serif;
   color: #f7f8f8;
@@ -135,28 +195,29 @@ a {
   }
 
   .el-header {
-    background-color: #0f2027;
+    /* background-color: #0f2027; */
+    background-color: #333;
     color: #333;
     text-align: center;
     /* line-height: 60px; */
   }
   .el-footer {
-    background-color: #2c5364;
+    /* background-color: #2c5364; */
+    background-color: #333;
     color: #333;
     text-align: center;
     line-height: 60px;
   }
   .el-main {
-    background-color: #203a43;
+    background-color: #333;
     color: #333;
     text-align: center;
-    /* line-height: 160px; */
   }
   body > .el-container {
     margin-bottom: 40px;
   }
   .el-card{
-    background: #1f1e33;
+    background: #989898;
     width: 300px;
     display: inline-block;
     margin: 0.3em;
@@ -165,7 +226,88 @@ a {
   .row-footer{
     font-weight: normal;
     font-family: Arial, Helvetica, sans-serif;
-    /* color: #f8f7f7; */
+    color: #f8f7f7;
+  }
+  .row-header {
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(101, 101, 101, 101.12), 0 0 6px rgba(101, 101, 101, 0.04);
+  }
+  .time {
+    font-size: 13px;
+    color: #999;
   }
 
+  .bottom {
+    margin-top: 13px;
+    line-height: 12px;
+  }
+  .button {
+    padding: 0;
+    float: none;
+    color: #000;
+    /* text-decoration: underline; */
+  }
+
+  .image {
+    width: 100%;
+    height:200px;
+    display: block;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+      display: table;
+      content: "";
+  }
+
+  .clearfix:after {
+      clear: both
+  }
+  .article-title{
+      font-family: -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+      text-align: left;
+  }
+  .asset-title-date {
+    font-family: robotomedium;
+    font-style: italic;
+    color: #a6a6a6;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+  .portlet-asset-publisher h3.asset-title {
+    margin-top: 10px;
+    border-bottom: 0;
+    line-height: 20px;
+    font-family: robotolight;
+    font-size: 40px;
+  }
+  .footer .fri-link select {
+    width: 250px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    color: #909090;
+    border: none;
+    padding-left: 8px;
+    margin-top: -28px;
+    /* background: url(../images/xl2.png) no-repeat 220px 12px; */
+    background-color: #fff;
+  }
+
+  .logo img{
+    width: 100%;
+    vertical-align: middle;
+    outline: none;
+    border: 0;
+  }
+  .contact{
+    /* margin-right: 20px; */
+    border-right:1px solid #ddd;
+  }
 </style>

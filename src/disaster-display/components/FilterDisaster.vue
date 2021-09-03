@@ -10,7 +10,7 @@
     </el-collapse>
     <div style="margin: 15px 0"></div>
     <div>
-      <el-button round @click="queryType">Summit</el-button>
+      <el-button round @click="queryType">Submit</el-button>
     </div>
     <div>
       <el-row
@@ -32,7 +32,7 @@
               @click.native="clickinfo(dis.id)"
             >
               <img
-                :src="require('../assets/disaster-img/img' + dis.id + '.png')"
+                :src="require('../assets/disaster-img/img' + dis.did + '.png')"
                 class="image"
               />
             </el-card>
@@ -53,13 +53,19 @@
               class="located-button"
               type="primary"
               style="margin-bottom: 15px"
-              v-on:click="sendLocFlag(dis.id)"
+              v-on:click="sendLocFlag(dis.id, dis.did)"
               >Locate on map</el-button
             >
           </div>
         </el-col>
       </el-row>
     </div>
+    <!-- test code -->
+    <!-- <div>
+      <p style="color:red;">Num：{{ myIndex }}</p>
+    <p>{{ msg }}</p>
+    </div> -->
+    <!-- test code -->
 
     <el-dialog :visible.sync="dialogVisible" width="55%">
       <div style="margin: 15px 0"></div>
@@ -126,7 +132,7 @@ import bus from "./eventBus";
 import axios from "axios";
 
 export default {
-  name: "filterOfPictures",
+  name: "filterOfDisaster",
   data() {
     return {
       CollapseActiveNames: [],
@@ -145,9 +151,9 @@ export default {
         //   date: "2021-07-15,18:23:00",
         //   description:
         //     "Heavy rainfall has caused severe flooding in parts of Switzerland. Trees have been blown onto roads and rail tracks in Zurich, causing travel chaos for commuters.A warning issued to citizens has stated that several rivers could burst their banks, while some Alpine passes were temporarily closed due to heavy snowfall.More than four centimetres of rain fell on Zurich overnight on Monday 12 July 2021 and over 3.1 centimetres of rain fell in just 10 minutes on nearby Waldegg, according to broadcaster SRF.Officials in the de facto capital, Bern, are preparing for possible flooding by installing floating dams. The country's meteorological services have warned that further rain is forecast, and also urged caution of potential landslides.Authorities near Lake Lucerne, Lake Geneva, and Lake Zurich have also issued alerts for local residents and shipping companies. Lake Lucerne, in particular, is at a very high risk of flooding, warned MeteoSchweiz.",
-        //   requestor:
+        //   sponsor:
         //     "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
-        //   management: "Swiss Federal Office of Topography",
+        //   responsor: "Swiss Federal Office of Topography",
         //   isdisplay_type: true,
         //   isdisplay_time: true,
         //   isdisplay_country: true,
@@ -162,8 +168,8 @@ export default {
         //   date: "2021-07-06,10:32:00",
         //   description:
         //     "An explosion occurred about 03:00 am on 5 July 2021 at the Ming Dih Chemical factory, a factory producing plastic foam and plastic pellets, in Bang Phli district, Samut Prakan province, the outskirts of Thailand's capital.",
-        //   requestor: "UNITAR on behalf of UNOCHA",
-        //   management: "UNITAR",
+        //   sponsor: "UNITAR on behalf of UNOCHA",
+        //   responsor: "UNITAR",
         //   isdisplay_type: true,
         //   isdisplay_time: true,
         //   isdisplay_country: true,
@@ -178,9 +184,9 @@ export default {
         //   date: "2012-03-10,11:30:00",
         //   description:
         //     "Heavy rains continued to pour inJocay, Ecuadorthis week, causing flooding across coastal communities. In an official statement from the Ecuadorian government, they announced that at least 20 people were killed and 65 people were severly injured due to flooding withincoastal provinces. 166 homes have been destroyed and 2,823 people have been evacuated from their homes to sheltersand other communities. In February, hundreds of people fled their homes to seek shelter after severe rains caused floods and damaged local crops and produce. Ecuador's National Institute of Meteorology and Hydrologyforecast further heavy rains during the months of March and April.",
-        //   requestor:
+        //   sponsor:
         //     "USGS on behalf of Secretaría Nacional de Gestión de Riesgos - SNGR (Ecuador)",
-        //   management:
+        //   responsor:
         //     "Oficina de Gestión Corporativa de CLIRSEN Quito - ECUADOR",
         //   isdisplay_type: true,
         //   isdisplay_time: true,
@@ -196,65 +202,118 @@ export default {
         //   date: "2019-04-10,11:00:00",
         //   description:
         //     "A volcanic eruption in Iceland spread black smoke and white steam into the air and partly melted a glacier, 700 people have been evacuated. As a consequence of the smoke cloud, most of the european airspace has been progressively closed.",
-        //   requestor:
+        //   sponsor:
         //     "Ministry of the Interior – Direction de la Sécurité Civile - COGIC",
-        //   management:
+        //   responsor:
         //     "CNES in collaboration with the SAFER project in the framework of the GMES initiative",
         //   isdisplay_type: true,
         //   isdisplay_time: true,
         //   isdisplay_country: true,
         //   isdisplay: true,
         // },
+        // {
+        //   id: "5",
+        //   name: "Earthquake in Nepal",
+        //   type: "Earthquake",
+        //   country: "Nepal",
+        //   location: [84.5, 28],
+        //   date: "2021-05-22,00:36:00",
+        //   description:
+        //     "At 14:11 on April 25, 2015, a magnitude 8.1 earthquake occurred in Nepal (28.2 degrees north latitude and 84.7 degrees east longitude), with a focal depth of 20 km. The epicenter of the earthquake was located in Pokhara.",
+        //   sponsor: "National Disaster Reduction Center of Nepal",
+        //   responsor: "CNSA",
+        //   isdisplay_type: true,
+        //   isdisplay_time: true,
+        //   isdisplay_country: true,
+        //   isdisplay: true,
+        // },
       ],
+      myIndex: 0, //灾害类型传值变量
     };
   },
   mounted() {
+    this.myIndex = parseInt(this.$route.query.id); //获取首页灾害id
     this.init();
-    console.log(this.DisasterList.length);
   },
   methods: {
-    // 对 DisasterList添加灾害列表
+    // 对 DisasterList 添加灾害列表
     init() {
       axios({
-        url: "http://localhost:11000/disasterResponse/disasterGetAll", // 获取所有Disaster_response
+        url: "http://116.62.228.138:10003/disasterResponse/disasterGetAll", // 获取所有Disaster_response
         method: "get",
       }).then((res) => {
         var len = res.data.data.length;
         var dis_data = res.data.data;
 
-        for (var i = len - 1; i >= 0; i--) {
+        dis_data = dis_data.filter((item) => item.description != null);
+
+        let totalNum = 0;
+        for (let i = 0; i < len; i++) {
           this.DisasterList.push({
-            id: dis_data[i].did,
+            id: ++totalNum, // 在项目中的disaster-id，从1起始
+            did: dis_data[i].did, // 原始 disaster-id
             name: dis_data[i].name,
-            type: dis_data[i].tag, // 需要改
+            type: dis_data[i].tag,
             country: dis_data[i].country,
             location: [dis_data[i].lon, dis_data[i].lat],
             date: dis_data[i].startTime,
             description: dis_data[i].description,
-            // 需要改成sponsor & responsor
             sponsor: dis_data[i].sponsor,
             responsor: dis_data[i].responsor,
+            geojson: dis_data[i].aoijson,
+            dtype: dis_data[i].dtype, //灾害类型id
             isdisplay_type: true,
             isdisplay_time: true,
             isdisplay_country: true,
-            isdisplay: true,
+            isdisplay_did: true,
+            isdisplay: false,
           });
-          console.log(dis_data[i].did);
+        }
+       // this.DisasterList.sort(compare("did"));
+
+        // var num = 0;
+        // switch (this.myIndex) {
+        //   case ("1", "3", "4", "6", "7", "8"):
+        //     num = parseInt(this.myIndex);
+        //     break;
+        //   case "2":
+        //     num = 5;
+        //     break;
+        //   case "5":
+        //     num = 2;
+        //     break;
+        //   case "9":
+        //     break;
+        //   default:
+        //     break;
+        // }
+        if(this.myIndex==2)this.myIndex=5;
+        else if(this.myIndex==5)this.myIndex=2;
+        else{}
+        console.log("ovijbpbpkn[m p");
+
+        console.log(this.myIndex);
+        //按首页点击的灾害类型过滤
+        for (let i = 0; i < this.DisasterList.length; i++) {
+          if (this.DisasterList[i].dtype == this.myIndex || this.myIndex == 0) {
+            this.DisasterList[i].isdisplay = true;
+            //console.log("did", i);
+          } else this.DisasterList[i].isdisplay = false;
         }
       });
     },
     handleChange(val) {},
     clickinfo(id) {
       this.dialogVisible = true;
-      console.log(this.DisasterList[id - 1].name);
+      // console.log(this.DisasterList[id - 1].name);
       this.Selectedid = id - 1;
     },
 
-    sendLocFlag(id) {
+    sendLocFlag(id, did) {
       //var index = id.to
       var loc = this.DisasterList[id - 1].location;
       var title = this.DisasterList[id - 1].name;
-      bus.$emit("LocToDisaster", loc, id);
+      bus.$emit("LocToDisaster", loc, did);
       bus.$emit("TitleOfDisaster", title, id);
       this.borderid = id - 1;
     },
@@ -268,20 +327,48 @@ export default {
       this.selectionTime = selection;
     },
     queryType() {
-      //按type过滤
-      for (var i = 0; i < this.DisasterList.length; i++) {
-        for (var j = 0; j < this.selectionContent.length; j++) {
-          console.log(this.selectionContent[j].name);
+      //类型id转换
+      // let num = 0;
+      // switch (this.myIndex) {
+      //   case ("1", "3", "4", "6", "7", "8"):
+      //     num = parseInt(this.myIndex);
+      //     break;
+      //   case "2":
+      //     num = 5;
+      //     break;
+      //   case "5":
+      //     num = 2;
+      //     break;
+      //   case "9":
+      //     break;
+      //   default:
+      //     break;
+      // }
+
+      
+      // //按首页点击的灾害类型过滤
+      // for (let i = 0; i < this.DisasterList.length; i++) {
+      //   if (this.DisasterList[i].dtype == num || num == 0) {
+      //     this.DisasterList[i].isdisplay_did = true;
+      //     //console.log("did", i);
+      //   } else this.DisasterList[i].isdisplay_did = false;
+      // }
+
+      //按勾选的灾害类型过滤
+      for (let i = 0; i < this.DisasterList.length; i++) {
+        if (this.selectionContent.length == 0) {
+          this.DisasterList[i].isdisplay_type = false;
+        }
+        for (let j = 0; j < this.selectionContent.length; j++) {
           if (this.DisasterList[i].type == this.selectionContent[j].name) {
             this.DisasterList[i].isdisplay_type = true;
-
             break;
           } else this.DisasterList[i].isdisplay_type = false;
         }
       }
 
-      //按时间过滤
-      for (var i = 0; i < this.DisasterList.length; i++) {
+      //按勾选的时间过滤
+      for (let i = 0; i < this.DisasterList.length; i++) {
         var year = this.DisasterList[i].date.substr(0, 4);
         var month = this.DisasterList[i].date.substr(5, 2);
         var datanumber = (parseInt(year) - 2000) * 12 + parseInt(month);
@@ -300,8 +387,10 @@ export default {
         this.DisasterList[i].isdisplay =
           this.DisasterList[i].isdisplay_type &&
           this.DisasterList[i].isdisplay_time &&
-          this.DisasterList[i].isdisplay_country;
+          this.DisasterList[i].isdisplay_country &&
+          this.DisasterList[i].isdisplay_did;
       }
+      this.myIndex = null; // 更新index，过滤条件初始化
     },
   },
   components: {
@@ -354,12 +443,18 @@ export default {
   clear: both;
 }
 
+/* 选中显示的卡片 */
 .displayrow.showborder {
+  color: #ffffff;
   border-style: solid;
-  border-color: #b3c0d1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  border-color: #409eff;
+  box-shadow: 0 2px 4px rgba(81, 172, 233, 0.72),
+    0 0 6px rgba(81, 172, 233, 0.94);
 }
+/* 未选中时卡片 */
 .displayrow.hideborder {
-  border-color: white;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.72),
+    0 0 6px rgba(255, 255, 255, 0.94);
 }
 </style>

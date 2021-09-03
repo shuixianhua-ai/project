@@ -1,11 +1,11 @@
 <template>
   <div class="bottom-right-table-1">
-    <dv-border-box-6>
+    <dv-border-box-6 class="box">
       <div class="table-name">
-        <img src="./img/icon1.png" />人员贡献排行榜
+        <img src="./img/icon1.png" /> Heated Words
       </div>
 
-      <dv-scroll-board :config="config" />
+      <dv-scroll-ranking-board :config="config" style="width:100%;height:65%" />
     </dv-border-box-6>
   </div>
 </template>
@@ -17,22 +17,36 @@ export default {
     return {
       config: {
         data: [
-          ['张三', '月累计排除故障：4起'],
-          ['李四', '月累计排除故障：3起'],
-          ['王五', '月累计排除故障：3起'],
-          ['赵六', '月累计排除故障：3起'],
-          ['钱七', '月累计排除故障：2起'],
-          ['孙八', '月累计排除故障：2起'],
-          ['杨九', '月累计排除故障：2起'],
-          ['吴十', '月累计排除故障：2起'],
-          ['李雷', '月累计排除故障：2起'],
-          ['韩梅梅', '月累计排除故障：2起']
+          {
+            name: 'floods',
+            value: 105
+          },
+          {
+            name: 'landslides',
+            value: 72
+          },
+          {
+            name: 'rains',
+            value: 57
+          },
+          {
+            name: 'dead',
+            value: 53
+          },
+          {
+            name: 'trigger',
+            value: 51
+          },
+          {
+            name: 'kill',
+            value: 39
+          },
+          {
+            name: 'people',
+            value: 31
+          }
         ],
         index: true,
-        columnWidth: [30, 70],
-        align: ['center'],
-        oddRowBGC: 'rgba(9, 37, 50, 0.4)',
-        evenRowBGC: 'rgba(10, 32, 50, 0.3)'
       }
     }
   }
@@ -41,7 +55,7 @@ export default {
 
 <style lang="less">
 .bottom-right-table-1 {
-  width: calc(~"25% + 10px");
+  width: calc(~"50% + 10px");
   height: 100%;
   margin: 0 -5px;
 
@@ -63,7 +77,9 @@ export default {
       margin-right: 5px;
     }
   }
-
+  .box{
+    width: calc(~"100% - 20px");
+  }
   .dv-scroll-board {
     height: calc(~"100% - 60px");
   }

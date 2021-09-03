@@ -1,32 +1,107 @@
 <template>
+<div>
+  <div>
+  <!-- <nav id="menu" v-if="2==2"></nav> -->
   <div id='map'></div>
+  <!-- <el-button v-if="type=='2'" @click="loadData()">loadData</el-button> -->
+  <!-- <nav id="menu" v-show="type=='2'">Response</nav> -->
+  <div v-show="type=='2'"><response></response></div>
+  </div>
+</div>
 </template>
 
 <script>
 // 也可以全局引入 但是建议map对象还是少做传值，可以通过组件通信，统一在此处操作
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import Response from './Response'
+let storage = window.localStorage
+
 export default {
+  components: { Response },
   name: 'Map',
   data () {
-    return {}
+    return {
+      type:storage['type'],
+      datasource: {}
+    }
   },
   mounted () {
     this.init()
   },
   methods: {
+    loadData () {
+      console.log(storage['type'], 2222)
+      // console.log(datasource)
+    },
     init () {
+      var url = 'https://webapi.amap.com/maps?v=1.4.15&key=69af142a5df4feb0d3149bd89f2a0901&callback=onLoad';
+      var jsapi = document.createElement('script');
+      jsapi.charset = 'utf-8';
+      jsapi.src = url;
+      let mydata = this
+      mydata.$axios({
+        method: 'get',
+        url: 'http://116.62.228.138:10003/disasterResponse/disasterGetAll'
+      })
+        .then(res => {
+          console.log(res.data.data, 'data.data')
+          mydata.datasource = res.data.data
+          // console.log(mydata.datasource, 'datasource1')
+          mystorage=res.data.data
+        })
       mapboxgl.accessToken =
         'pk.eyJ1IjoiaHVkYW53ZWkiLCJhIjoiY2tyZDNmbGY4NTgzZjJxbzZnem1zZ21yNCJ9.WR-eaeODn3yE84w_wyvg1Q'
-
+      let localhost = window.location.origin
+      let sources = {
+        'osm-tiles1': {
+          'type': 'raster',
+          'tiles': [
+            'http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}'
+          ],
+          'tileSize': 256
+        },
+        'osm-tiles2': {
+          'type': 'raster',
+          'tiles': [
+            'http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}'
+          ],
+          'tileSize': 256
+        }
+      }
+      let layers = [{
+        'id': 'simple-tiles1',
+        'type': 'raster',
+        'source': 'osm-tiles1'
+      },
+      {
+        'id': 'simple-tiles2',
+        'type': 'raster',
+        'source': 'osm-tiles2'
+      }
+      ]
       var map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/dark-v10',
+        // style: 'mapbox://styles/mapbox/dark-v10',
         zoom: 1.35,
+        maxZoom:1.5,
+        minZoom:1.2,
         // renderWorldCopies:false
         center: [10, 10],
-        logoPosition: 'bottom-right'
+        logoPosition: 'bottom-right',
+        style: {
+          'version': 8,
+          'sprite': 'mapbox://sprites/mapbox/streets-v8',
+          'glyphs': localhost + '/MapBoxGL/css/font/{fontstack}/{range}.pbf',
+          'sources': sources,
+          'layers': layers
+        }
+        
       })
+      // mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js');
+      // map.addControl(new MapboxLanguage({
+      //       defaultLanguage: 'en'
+      //   }));
 
       var size = 200
 
@@ -83,7 +158,23 @@ export default {
         }
       }
 
+      
+      var id = 'Response';
+
+      var link = document.createElement('a');
+      link.href = '#';
+      link.className = 'active';
+
+      link.onclick = function (e) {
+          console.log("respon 方法")
+      };
+
+      var responseLayers = document.getElementById('menu');
+      responseLayers.appendChild(link);
+      
+      //加载图层
       map.on('load', function () {
+        console.log('test')
         map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 })
         map.addLayer({
           id: 'places',
@@ -96,48 +187,47 @@ export default {
                 {
                   type: 'Feature',
                   properties: {
-                    description:
-                      '<strong>Make it Mount Pleasant</strong><p><a href="http://www.mtpleasantdc.com/makeitmtpleasant" target="_blank" title="Opens in a new window">Make it Mount Pleasant</a> is a handmade and vintage market and afternoon of live entertainment and kids activities. 12:00-6:00 p.m.</p>',
-                    icon: 'theatre'
+                    description: `<strong>${mydata.datasource[0].name}</strong><p style="text-align:left"><b >Sponsor: </b>${mydata.datasource[0].sponsor}</p><p style="text-align:left"><strong>Responsor: </strong>${mydata.datasource[0].responsor}</strong><p style="text-align:left"><strong >StartTime: </strong>${mydata.datasource[0].startTime}</p><p style="text-align:left"><strong>EndTime: </strong>${mydata.datasource[0].endTime}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
+                    icon: 'monument'
                   },
                   geometry: {
                     type: 'Point',
-                    coordinates: [0, 0]
+                    coordinates: [mydata.datasource[0].lon, mydata.datasource[0].lat]
+                  }
+                },
+                {
+                  type: 'Feature',
+                  properties: {
+                    description: `<strong>${mydata.datasource[1].name}</strong><p style="text-align:left"><b >Sponsor: </b>${mydata.datasource[1].sponsor}</p><p style="text-align:left"><strong>Responsor: </strong>${mydata.datasource[1].responsor}</strong><p style="text-align:left"><strong >StartTime: </strong>${mydata.datasource[1].startTime}</p><p style="text-align:left"><strong>EndTime: </strong>${mydata.datasource[1].endTime}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
+                    icon: 'harbor'
+                  },
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [mydata.datasource[1].lon, mydata.datasource[1].lat]
                   }
                 },
                 {
                   type: 'Feature',
                   properties: {
                     description:
-                      '<strong>Mad Men Season Five Finale Watch Party</strong><p>Head to Lounge 201 (201 Massachusetts Avenue NE) Sunday for a <a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Mad Men Season Five Finale Watch Party</a>, complete with 60s costume contest, Mad Men trivia, and retro food and drink. 8:00-11:00 p.m. $10 general admission, $20 admission and two hour open bar.</p>',
-                    icon: 'theatre'
+                      `<strong>${mydata.datasource[2].name}</strong><p>${mydata.datasource[2].description}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
+                       icon: 'theatre'
                   },
                   geometry: {
                     type: 'Point',
-                    coordinates: [230, 33]
-                  }
-                },
-                {
-                  type: 'Feature',
-                  properties: {
-                    description:
-                      '<strong>Mad Men Season Five Finale Watch Party</strong><p>Head to Lounge 201 (201 Massachusetts Avenue NE) Sunday for a <a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Mad Men Season Five Finale Watch Party</a>, complete with 60s costume contest, Mad Men trivia, and retro food and drink. 8:00-11:00 p.m. $10 general admission, $20 admission and two hour open bar.</p>',
-                    icon: 'theatre'
-                  },
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [112, 34]
+                    coordinates: [mydata.datasource[2].lon, mydata.datasource[2].lat]
                   }
                 }
               ]
             }
           },
           layout: {
-            'icon-image': 'pulsing-dot',
+            'icon-image': '{icon}-15',
             'icon-allow-overlap': true
+             
           }
         })
-
+        
         // When a click event occurs on a feature in the places layer, open a popup at the
         // location of the feature, with description HTML from its properties.
         map.on('click', 'places', function (e) {
@@ -178,16 +268,38 @@ export default {
         if ('_attribHTML' in control) {
           map.removeControl(control)
         }
+        console.log(mydata.datasource, 'datasourece2last')
       })
+      
     }
   }
 }
 </script>
 
 <style scoped>
-#map {
-  bottom: 0;
-  width: 100%;
-  height: 650px;
-}
+    #map {
+      bottom: 0;
+      width: 100%;
+      height: 650px;
+      /* z-index: -1; */
+    }
+    button {
+      position: absolute;
+      margin: 20px;
+      color: yellow;
+    }
+   #menu {
+        background: #3887be;
+        position: absolute;
+        z-index: 1;
+        top: 100px;
+        right: 38px;
+        border-radius: 3px;
+        width: 120px;
+        height: 50px;
+        border: 1px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+        line-height:50px;
+    }
+
 </style>

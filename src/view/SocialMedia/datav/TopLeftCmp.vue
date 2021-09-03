@@ -2,24 +2,22 @@
   <div class="top-left-cmp">
     <div class="dc-left">
       <dv-border-box-5>
-        <div class="main-value"><span>0</span>件</div>
-        <div class="compare-value"><span>同比</span>81</div>
-        <div class="compare-value"><span>环比</span>15</div>
+        <div class="main-value"><span>2</span></div>
+        <div class="compare-value">Indonesia lanslide</div>
+        <div class="compare-value">California Wildfires</div>
       </dv-border-box-5>
       <div class="dc-text">
-        运维人均工作量
+        Responsing
         <dv-decoration-3 style="width:200px;height:20px;" />
       </div>
     </div>
     <div class="dc-right">
       <div class="dc-text">
-        当月维修任务量
+        Response Disaster
         <dv-decoration-3 style="width:200px;height:20px;" />
       </div>
       <dv-border-box-5 :reverse="true">
-        <div class="main-value"><span>0.1</span>件 / 日</div>
-        <div class="compare-value"><span>同比</span>66</div>
-        <div class="compare-value"><span>环比</span>9</div>
+        <div class="main-value"><span>Indonesia lanslide</span></div>
       </dv-border-box-5>
     </div>
   </div>
@@ -78,13 +76,14 @@ export default {
     font-size: 30px;
 
     span {
-      font-size: 50px;
+      font-size:30px;
       color: #00c0ff;
       margin-right: 15px;
     }
   }
 
   .compare-value {
+    margin-left: -30px;
     height: 35px;
     line-height: 35px;
     font-size: 18px;

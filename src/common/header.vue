@@ -1,25 +1,36 @@
 <template>
   <header :class="{headerSticky:header_fixed}">
-    <a href="#" class="logo" :class="{logoSticky:header_fixed}">GIS</a>
+    <a href="#" class="logo" :class="{logoSticky:header_fixed}">
+      <img src="../../src/assets/pictures/MainPage-img/logo.png" height="85px" width="auto">
+    </a>
+    <a href="#" class="logo" :class="{logoSticky:header_fixed}">
+      International disaster data and information service
+    </a>
     <ul>
       <li>
         <router-link to="/" :class="{aSticky:header_fixed}">Home</router-link>
       </li>
       <li>
-        <router-link to="/Tinymce" :class="{aSticky:header_fixed}">About</router-link>
-      </li>
-      <li>
         <router-link to="/News" :class="{aSticky:header_fixed}">News</router-link>
       </li>
       <li>
-        <router-link to="/Others" :class="{aSticky:header_fixed}">Contact</router-link>
+        <router-link to="/SocialMedia" :class="{aSticky:header_fixed}">Social Media</router-link>
+      </li>
+      <li>
+        <router-link to="/DisasterDisplay" :class="{aSticky:header_fixed}">Disaster Display</router-link>
+      </li>
+      <li>
+        <router-link to="/Upload" :class="{aSticky:header_fixed}">Upload Data</router-link>
+      </li>
+      <li>
+        <router-link to="/Weather" :class="{aSticky:header_fixed}">Weather</router-link>
       </li>
       <li>
         <router-link to="/UserCenter" :class="{aSticky:header_fixed}" v-if="isLogin">User Center</router-link>
         <router-link to="/Login" :class="{aSticky:header_fixed}" v-else>Sign In</router-link>
       </li>
       <li>
-        <a :class="{aSticky:header_fixed}" v-if="isLogin" @click="signOut">Sign Out</a>
+        <a :class="{aSticky:header_fixed}" v-if="isLogin" @click="signOut" style="cursor:pointer">Sign Out</a>
       </li>
     </ul>
   </header>
@@ -79,7 +90,7 @@ export default {
     } else {
       this.$axios({
         method: 'get',
-        url: 'http://127.0.0.1:11000/users/isLogin',
+        url: 'http://116.62.228.138:10003/users/isLogin',
         headers: {
           'Content-Type': 'application/json',
           'token': storage['token']
@@ -106,6 +117,7 @@ export default {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
+
 header {
   position: fixed;
   top: 0;
@@ -115,36 +127,42 @@ header {
   justify-content: space-between;
   align-items: center;
   transition: 0.6s;
-  padding: 40px 70px;
+  padding: 40px 20px;
   z-index: 100000;
 }
+
 .headerSticky {
-  padding: 5px 70px;
+  padding: 5px 20px;
   background: #fff;
 }
+
 .logo {
   position: relative;
   font-weight: 700;
   color: #fff;
   text-decoration: none;
-  font-size: 2em;
+  font-size: 0.5em;
   text-transform: uppercase;
   letter-spacing: 2px;
   transition: 0.6s;
 }
+
 .logoSticky {
   color: #000;
 }
+
 header ul {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 header ul li {
   position: relative;
   list-style: none;
 }
+
 header ul li a {
   position: relative;
   margin: 0 15px;
@@ -154,6 +172,7 @@ header ul li a {
   font-weight: 500;
   transition: 0.6s;
 }
+
 .aSticky {
   color: #000;
 }

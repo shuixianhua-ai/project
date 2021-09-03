@@ -4,7 +4,7 @@
         {
             "type": "Feature",
             "properties": {
-                "description": "<strong>Earthquake in Nepal</strong><p>At 14:11 on April 25, 2015, a magnitude 8.1 earthquake occurred in Nepal (28.2 degrees north latitude and 84.7 degrees east longitude), with a focal depth of 20 km. The epicenter of the earthquake was located in Pokhara.</p>"
+                "description": "<strong>Earthquake in Nepal</strong><p>2015-05-25</p><p>At 14:11 on April 25, 2015, a magnitude 8.1 earthquake occurred in Nepal (28.2 degrees north latitude and 84.7 degrees east longitude), with a focal depth of 20 km. The epicenter of the earthquake was located in Pokhara.</p>"
             },
             "geometry": {
                 "type": "Point",

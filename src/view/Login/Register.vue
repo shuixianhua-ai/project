@@ -188,11 +188,10 @@
                   { required: true, message: 'Please input the password', trigger: 'blur' }
                 ]"
           >
-            <el-input v-model="registerForm.password" show-password placeholder="Uppercase, lowercase letters and numbers"></el-input>
+            <el-input v-model="registerForm.password" show-password></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="register('registerForm')" style="margin-right: 40px">Register</el-button>
-            <router-link to="/Login"><el-button>Back</el-button></router-link>
+            <el-button type="primary" @click="register('registerForm')">Register</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -201,8 +200,6 @@
 </template>
 
 <script>
-let storage = window.localStorage
-
 export default {
   name: 'Register',
   data () {
@@ -247,20 +244,15 @@ export default {
       }
     },
     sendAuthCode () {
-      // this.authCodeWidth = 38
-      // this.sendState = true
-      // this.countDown = 60
-      // this.sendCountDown()
       this.$axios({
         method: 'get',
-        url: 'http://127.0.0.1:11000/users/authCode',
+        url: 'http://116.62.228.138:10003/users/authCode',
         params: {
           mailAddr: this.registerForm.email
         }
       })
         .then(res => {
           console.log(res.data)
-          storage['authCode'] = res.data.data
           if (res.data.state === true) {
             this.$notify({
               title: 'Success',
@@ -289,77 +281,60 @@ export default {
     },
     register (formName) {
       this.$refs[formName].validate((valid) => {
+        let obj = {
+          workplace: this.registerForm.workplace,
+          jobType: this.registerForm.jobType,
+          title: this.registerForm.title,
+          firstName: this.registerForm.firstName,
+          lastName: this.registerForm.lastName,
+          twitter: this.registerForm.twitter,
+          facebook: this.registerForm.facebook,
+          affiliation: this.registerForm.affiliation,
+          address1: this.registerForm.address1,
+          address2: this.registerForm.address2,
+          zipCode: this.registerForm.zipCode,
+          city: this.registerForm.city,
+          country: this.registerForm.country,
+          username: this.registerForm.username,
+          email: this.registerForm.email,
+          authCode: this.registerForm.authCode,
+          password: this.registerForm.password
+        }
+        let jsonObj = JSON.stringify(obj)
+        console.log(jsonObj)
         if (valid) {
-          if (this.registerForm.authCode === this.authCodeGet) {
-            let obj = {
-              workplace: this.registerForm.workplace,
-              jobType: this.registerForm.jobType,
-              title: this.registerForm.title,
-              firstName: this.registerForm.firstName,
-              lastName: this.registerForm.lastName,
-              twitter: this.registerForm.twitter,
-              facebook: this.registerForm.facebook,
-              affiliation: this.registerForm.affiliation,
-              address1: this.registerForm.address1,
-              address2: this.registerForm.address2,
-              zipCode: this.registerForm.zipCode,
-              city: this.registerForm.city,
-              country: this.registerForm.country,
-              username: this.registerForm.username,
-              email: this.registerForm.email,
-              authCode: this.registerForm.authCode,
-              password: this.registerForm.password
-            }
-            let jsonObj = JSON.stringify(obj)
-            console.log(jsonObj)
-            this.$axios({
-              method: 'post',
-              url: 'http://127.0.0.1:11000/users/register',
-              headers:
-                {
-                  'Content-Type': 'application/json;charset=UTF-8'
-                },
-              data: jsonObj
+          this.$axios({
+            method: 'post',
+            url: 'http://116.62.228.138:10003/users/register',
+            headers:
+            {
+              'Content-Type': 'application/json;charset=UTF-8'
+            },
+            data: jsonObj
+          })
+            .then(res => {
+              switch (res.data.state) {
+                case true:
+                  this.$notify({
+                    title: 'Success',
+                    message: 'Success to Register',
+                    type: 'success',
+                    offset: 100
+                  })
+                  window.location.href = 'http://localhost:8080/Login'
+                  break
+                case false:
+                  this.$notify.error({
+                    title: 'Error',
+                    message: res.msg,
+                    offset: 100
+                  })
+                  break
+              }
             })
-              .then(res => {
-                switch (res.data.state) {
-                  case true:
-                    this.$notify({
-                      title: 'Success',
-                      message: 'Success to Register',
-                      type: 'success',
-                      offset: 100
-                    })
-                    window.location.href = 'http://localhost:8080/Login'
-                    break
-                  // case 2:
-                  //   this.$notify({
-                  //     title: 'Warning',
-                  //     message: 'Auth Code Error',
-                  //     type: 'warning',
-                  //     offset: 100
-                  //   })
-                  //   break
-                  case false:
-                    this.$notify.error({
-                      title: 'Error',
-                      message: res.data.msg,
-                      offset: 100
-                    })
-                    break
-                }
-              })
-              .catch(err => {
-                console.log(err)
-              })
-          } else {
-            this.$notify({
-              title: 'Warning',
-              message: 'Invalid Auth Code',
-              type: 'warning',
-              offset: 100
+            .catch(err => {
+              console.log(err)
             })
-          }
         } else {
           this.$notify({
             title: 'Warning',
@@ -377,7 +352,7 @@ export default {
 <style scoped>
 .register-box {
   width: 100vw;
-  height: 200vh;
+  height: 190vh;
   box-sizing: border-box;
 }
 .register-container {

@@ -45,7 +45,7 @@ export default {
         if (valid) {
           this.$axios({
             method: 'get',
-            url: 'http://127.0.0.1:11000/users/changePassword',
+            url: 'http://116.62.228.138:10003/users/changePassword',
             params: {
               uid: storage['id'],
               oldPwd: this.changePasswordForm.oldPassword,
@@ -88,7 +88,7 @@ export default {
               } else {
                 this.$notify.error({
                   title: 'Error',
-                  message: res.msg,
+                  message: res.data.msg,
                   offset: 100
                 })
               }
@@ -121,7 +121,7 @@ a {
 /*}*/
 .changePassword-form {
   padding-top: 10%;
-  width: 60%;
-  padding-left: 15%;
+  width: 40%;
+  padding-left: 30%;
 }
 </style>

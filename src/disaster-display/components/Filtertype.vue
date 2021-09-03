@@ -34,7 +34,7 @@
 const TypeOptions = [
   { imgSrc: require("../assets/icon/earthquake.png"), name: "Earthquake" },
   { imgSrc: require("../assets/icon/forestfire.png"), name: "Fire" },
-  { imgSrc: require("../assets/icon/crumble.png"), name: "Landslide" },
+  { imgSrc: require("../assets/icon/landslide.png"), name: "Landslide" },
   { imgSrc: require("../assets/icon/snow.png"), name: "Snow" },
   { imgSrc: require("../assets/icon/rainstorm.png"), name: "Rainstorm" },
   { imgSrc: require("../assets/icon/typhoon.png"), name: "Typhoon" },

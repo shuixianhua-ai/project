@@ -1,7 +1,7 @@
 <template>
   <div class="top-right-cmp">
     <div class="chart-name">
-      设备故障月趋势
+      Twitter NPL Trend 
       <dv-decoration-3 style="width:200px;height:20px;" />
     </div>
     <dv-charts :option="option" />
@@ -17,19 +17,15 @@ export default {
         legend: {
           data: [
             {
-              name: '收费系统',
-              color: '#00baff'
-            },
-            {
-              name: '监控系统',
+              name: 'Positive',
               color: '#ff5ca9'
             },
             {
-              name: '通信系统',
+              name: 'Negative',
               color: '#3de7c9'
             },
             {
-              name: '供配电系统',
+              name: 'Netural',
               color: '#f5d94e'
             }
           ],
@@ -73,24 +69,14 @@ export default {
           axisTick: {
             show: false
           },
-          min: 0,
-          max: 8
+          min: 40,
+          max: 100
         },
         series: [
           {
-            name: '收费系统',
+            name: 'Positive',
             data: [
-              2.5, 3.5, 6.5, 6.5, 7.5, 6.5, 2.5
-            ],
-            type: 'bar',
-            barStyle: {
-              fill: 'rgba(0, 186, 255, 0.4)'
-            }
-          },
-          {
-            name: '监控系统',
-            data: [
-              2.5, 3.5, 6.5, 6.5, 7.5, 6.5, 2.5
+              73, 55, 67, 78, 88, 93, 90
             ],
             type: 'line',
             lineStyle: {
@@ -105,9 +91,9 @@ export default {
             }
           },
           {
-            name: '通信系统',
+            name: 'Negative',
             data: [
-              1.3, 2.3, 5.3, 5.3, 6.3, 5.3, 1.3
+              43, 63, 53, 73, 43, 73, 53
             ],
             type: 'line',
             smooth: true,
@@ -127,10 +113,10 @@ export default {
           },
           {
             data: [
-              0.2, 1.2, 4.2, 4.2, 5.2, 4.2, 0.2
+              66, 66, 87, 45, 54, 42, 60
             ],
             type: 'line',
-            name: '供配电系统',
+            name: 'Netural',
             lineArea: {
               show: true,
               gradient: ['rgba(245, 217, 79, 0.8)', 'rgba(245, 217, 79, 0.2)']

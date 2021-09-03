@@ -3,6 +3,9 @@
     "features": [
         {
             "type": "Feature",
+            "properties": {
+                "description": "<strong>Volcanic eruption in Iceland</strong><p>2019-04-10</p><p>A volcanic eruption in Iceland spread black smoke and white steam into the air and partly melted a glacier, 700 people have been evacuated. As a consequence of the smoke cloud, most of the european airspace has been progressively closed.</p>"
+            },
             "geometry": {
                 "type": "Point",
                 "coordinates": [

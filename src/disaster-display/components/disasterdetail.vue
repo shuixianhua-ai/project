@@ -104,32 +104,37 @@ export default {
           date: "2016-05-02",
           name: "Product1",
           disaster: "Forest Fire",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor:
+            "USGS on behalf of Secretaría Nacional de Gestión de Riesgos - SNGR (Ecuador)",
+          responder:
+            "CNES in collaboration with the SAFER project in the framework of the GMES initiative",
         },
         {
           id: "2",
           date: "2016-07-04",
           name: "Product2",
           disaster: "Flood",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor: "UNITAR on behalf of UNOCHA",
+          responder: "UNITAR",
         },
         {
           id: "3",
           date: "2016-08-01",
           name: "Product3",
           disaster: "Typhoon",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor:
+            "Ministry of the Interior – Direction de la Sécurité Civile - COGIC",
+          responder:
+            "Oficina de Gestión Corporativa de CLIRSEN Quito - ECUADOR",
         },
         {
           id: "4",
           date: "2016-12-03",
           name: "Product4",
           disaster: "Snow storm",
-          sponsor: "AAA",
-          responder: "BBB",
+          sponsor:
+            "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+          responder: "Swiss Federal Office of Topography",
         },
       ],
     };

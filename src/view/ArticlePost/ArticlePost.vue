@@ -54,7 +54,7 @@ export default {
 
   },
   methods: {
-    articlePost (formName) {
+    articlePost () {
       let params = {
         title: this.articleForm.title,
         author: this.articleForm.author,
@@ -64,15 +64,17 @@ export default {
       console.log(jsonParams)
       this.$axios({
         method: 'post',
-        url: 'http://127.0.0.1:11000/news/articlePost',
+        url: 'http://116.62.228.138:10003/news/articlePost',
         headers:
           {
-            'Content-Type': 'application/json;charset=UTF-8'
+            'Content-Type': 'application/json;charset=UTF-8',
+            'token': storage['token']
           },
         data: jsonParams
       })
         .then(res => {
           if (res.data.state === true) {
+            console.log(res.data)
             this.$notify({
               title: 'Success',
               message: 'Success to Register',
@@ -81,6 +83,7 @@ export default {
             })
             window.location.href = 'http://localhost:8080/News'
           } else {
+            console.log(res.data)
             this.$notify.error({
               title: 'Error',
               message: res.msg,

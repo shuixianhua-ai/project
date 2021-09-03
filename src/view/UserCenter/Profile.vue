@@ -1,5 +1,5 @@
 <template>
-  <div class="otherPage">
+  <div>
     <div class="userInfo-form">
       <el-form :model="userInfoFrom" ref="userInfoFrom" label-width="140px" size="medium">
         <el-form-item
@@ -125,19 +125,19 @@
           </el-select>
         </el-form-item>
         <el-form-item
-          label="username"
+          label="Username"
           prop="username"
         >
           <el-input v-model="userInfoFrom.username" :placeholder="this.userInfoFrom.username"></el-input>
         </el-form-item>
         <el-form-item
-          label="email"
+          label="Email"
           prop="email"
         >
           <el-input v-model="userInfoFrom.email" :placeholder="this.userInfoFrom.email"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="changeUserInfo">update</el-button>
+          <el-button type="primary" @click="changeUserInfo">Update</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -191,7 +191,7 @@ export default {
       console.log(jsonObj)
       this.$axios({
         method: 'post',
-        url: 'http://127.0.0.1:11000/users/updateData',
+        url: 'http://116.62.228.138:10003/users/updateData',
         headers:
           {
             'Content-Type': 'application/json;charset=UTF-8',
@@ -280,10 +280,7 @@ h1, h2 {
 a {
   color: #42b983;
 }
-/*.otherPage {*/
-/*  height: 700px;*/
-/*  text-align: center;*/
-/*}*/
+
 .userInfo-form {
   padding-top: 40px;
   width: 60%;

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import OtherPage from '../view/Others/OtherPage'
 import NewsPage from '../view/NewsPage/NewsPage'
+import NewsDisplay from '../view/NewsPage/NewsDisplay'
 import MainPage from '../view/MainPage/MainPage'
 import ViewIndex from '../view/index'
 import SignIn from '../view/Login/SignIn'
@@ -14,11 +15,24 @@ import UserCenter from '../view/UserCenter/UserCenter'
 import Profile from '../view/UserCenter/Profile'
 import ManagerPassword from '../view/UserCenter/ManagerPassword'
 import ForgetPassword from '../view/Login/ForgetPassword'
+import Audit from '../view/UserCenter/ApplicationForm'
+import DisasterTable from '@/view/UserCenter/DisasterTable'
 
 import SocialMediaPage from '../view/SocialMedia/MainPage'
+import DataV from '../view/SocialMedia/DataV'
+import Content from '../view/SocialMedia/Content'
+import List from '../view/SocialMedia/List'
+import Analysis from '../view/SocialMedia/Analysis'
+import Trend from '../view/SocialMedia/Trend'
+import Map from '../view/SocialMedia/Map'
 
 import mainmap from '../disaster-display/components/mainpage'
 import baseLayout from '../disaster-display/components/baseLayout'
+
+import DataUpload from '../view/Upload/DataUpload'
+import Weather from '../view/Weather/Weather'
+// import { component } from 'vue/types/umd'
+
 Vue.use(Router)
 
 const recom = {
@@ -42,6 +56,10 @@ export default new Router({
         {
           path: '/News',
           component: NewsPage
+        },
+        {
+          path: '/NewsDisplay',
+          component: NewsDisplay
         },
         {
           path: '/Others',
@@ -70,13 +88,34 @@ export default new Router({
             {
               path: 'ManagerPassword',
               component: ManagerPassword
+            },
+            {
+              path: 'Audit',
+              component: Audit
+            },
+            {
+              path: 'DisasterTable',
+              component: DisasterTable
             }
           ]
         },
         {
+          path: '/Upload',
+          component: DataUpload
+        },
+        {
+          path: '/Weather',
+          component: Weather
+        },
+        {
           path: '/recom',
-          component: recom,   //引入recom,必不可少
+          component: recom,
           children: [
+            {
+              path: '/mainmap',
+              name: 'mainmap',
+              component: mainmap
+            },
             {
               path: '/DisasterDisplay',
               name: 'baseLayout',
@@ -85,8 +124,34 @@ export default new Router({
           ]
         },
         {
+          path: '/DataV',
+          component: DataV
+        },
+        {
           path: '/SocialMedia',
-          component: SocialMediaPage
+          component: SocialMediaPage,
+          children: [
+            {
+              path: 'Content',
+              component: Content
+            },
+            {
+              path: 'List',
+              component: List
+            },
+            {
+              path: 'Trend',
+              component: Trend
+            },
+            {
+              path: 'Map',
+              component: Map
+            },
+            {
+              path: 'Analysis',
+              component: Analysis
+            }
+          ]
         }
       ]
     }

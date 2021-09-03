@@ -12,7 +12,6 @@ import mapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import mapUrl from "../util/mapUrl";
 import axios from "axios";
-import * as turf from "@turf/turf";
 
 import bus from "./eventBus";
 import selectFrame from "./SelectMap.vue";
@@ -24,21 +23,12 @@ export default {
       flag: true,
       map: {}, // map 主变量属性
       draw: {},
-      getUrl: "http://localhost:11000/images/GetImages",
-      getdisasterUrl: "http://localhost:11000/disasterResponse/disasterGetAll",
-      disastertype:["earthquake", "forestfire", "landslide", "snow", "rainstorm", "typhoon", "vocano", "oceanwave", "other"],
-      imgList: [
-        {
-          id: "1",
-          isDisplay: false,
-          boundingBox: false,
-        },
-        {
-          id: "2",
-          isDisplay: false,
-          boundingBox: false,
-        },
-      ],
+      getImageUrl: "http://116.62.228.138:10003/images/GetImages",
+      getDisasterUrl:
+        "http://116.62.228.138:10003/disasterResponse/disasterGetAll",
+      focusDisaster: 0, // 当前map关注的灾害id
+      boxResData: {},
+      imgList: [],
       tianStyle: {
         version: 8,
         glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
@@ -147,26 +137,31 @@ export default {
   mounted() {
     this.init();
     var self = this;
-    bus.$on("MainpageImg", function (id, flag) {
-      // 1. 在imgList中，查询是否存在该id，若存在，则更改其flag；若不存在，则在列表中增加该对象
-      var modiIndex = self.imgList.findIndex((v) => {
-        return v.id == id;
-      });
-      if (modiIndex < 0) {
-        self.imgList.push({
-          id: id,
-          isDisplay: flag,
-          boundingBox: false,
-        });
-      } else {
-        self.imgList[modiIndex].isDisplay = flag;
-      }
 
-      // 2. 遍历ImgList，渲染至地图
-      for (var i = 1; i <= self.imgList.length; i++) {
-        var tempId = "Image" + i;
-        var tempUrl = require("../assets/img/img" + i + ".gif");
-        if (self.imgList[i - 1].isDisplay == true) {
+    // 点击影像按钮，切换相应影像可见性
+    bus.$on("MainpageImg", function (id, flag, imageList) {
+      for (let i = 0; i < imageList.length; i++) {
+        let tempId = "Img" + (i + 1);
+        let tempUrl, boxcoord;
+        if (i == 3) {
+          tempUrl = "api/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d"; //"http://116.62.228.138:10003/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
+          boxcoord = [
+            [7.6875885, 46.858175958],
+            [9.128057161, 46.865628248],
+            [9.130470362, 47.853627712],
+            [7.66286529, 47.845914827],
+          ];
+          console.log(tempUrl);
+        } else {
+          tempUrl = require("../assets/img/img" + (i + 1) + ".gif");
+          boxcoord = [
+            [-80.425, 46.437],
+            [-71.516, 46.437],
+            [-71.516, 37.936],
+            [-80.425, 37.936],
+          ];
+        }
+        if (imageList[i].imgDisplay == true) {
           if (!self.map.getLayer(tempId)) {
             self.map.addLayer({
               id: tempId,
@@ -174,17 +169,12 @@ export default {
               source: {
                 type: "image",
                 // 两种方式：1.加载本地image  2.加载网页image
-                url: tempUrl, //"https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif"
-                coordinates: [
-                  [-80.425, 46.437],
-                  [-71.516, 46.437],
-                  [-71.516, 37.936],
-                  [-80.425, 37.936],
-                ],
+                url: tempUrl, //"https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif", // tempUrl
+                coordinates: boxcoord,
               },
             });
           }
-        } else if (self.imgList[i - 1].isDisplay == false) {
+        } else if (imageList[i].imgDisplay == false) {
           if (self.map.getLayer(tempId)) {
             self.map.removeLayer(tempId);
             self.map.removeSource(tempId);
@@ -193,6 +183,7 @@ export default {
       }
     });
 
+    // 点击包围盒按钮，切换相应影像包围盒的可见性
     bus.$on("MainpageBox", function (imageList) {
       var layers = self.map.getStyle().layers;
 
@@ -201,10 +192,7 @@ export default {
         let tempRoute = "/static/boundingBox/imgBox" + (i + 1) + ".json";
 
         if (imageList[i].boundingBox == true) {
-          //console.log(tempId);
-          //console.log((!self.map.getLayer(tempId))+tempId);
           if (!self.map.getLayer(tempId)) {
-            //console.log(tempId+"1");
             axios.get(tempRoute).then((res) => {
               self.map.addLayer({
                 id: tempId,
@@ -213,9 +201,7 @@ export default {
                   type: "geojson",
                   data: res.data,
                 },
-                layout: {
-                  // 'visibility': 'visible'
-                },
+                layout: {},
                 paint: {
                   "line-color": "#088",
                   "line-width": 1.0,
@@ -239,44 +225,77 @@ export default {
     });
 
     bus.$on("MainpageLoc", function (id) {
-      // 根据影像包围盒，位于地图中央
-      var modiIndex = self.imgList.findIndex((v) => {
-        return v.id == id; //id
-      });
-      var boxLayer = "boxJson" + id;
+      // 根据影像包围盒位置，使其位于地图中央
 
       var route = "/static/boundingBox/imgBox" + (id + 1) + ".json";
       axios.get(route).then((res) => {
         var coorArray = res.data.features[0].geometry.coordinates;
         var xmid = (coorArray[0][0][0] + coorArray[0][1][0]) / 2;
         var ymid = (coorArray[0][0][1] + coorArray[0][2][1]) / 2;
-        console.log(xmid + "   " + ymid);
 
         self.map.flyTo({
           center: [xmid, ymid],
         });
       });
-
-      // 该影像已添加至地图，且包围盒存在
-      // if (modiIndex >= 0 && self.map.getLayer(boxLayer)) {
-      //   console.log(result.features[0].geometry.coordinates[0]);
-      //   var result = self.map.queryRenderedFeatures(null, {
-      //     layers: [boxLayer], //.filter((layer) => {this.map.getLayer(layer);}),
-      //   });
-      //   self.map.flyTo({
-      //     center: result.features[0].geometry.coordinates[0],
-      //   });
-      // }
     });
 
-    bus.$on("LocToDisaster", function (loc, id) {
+    bus.$on("LocToDisaster", function (loc, did) {
+      // 将map关注的灾害更改为did，同时center至该灾害位置
+      self.focusDisaster = did;
+
       self.map.flyTo({
         center: loc,
       });
+
+      var disBoxList = self.boxResData.filter((item) => item.did === did); // 该灾害下的影像框  --  影像框图层只要保持一致即可
+      let length = disBoxList.length;
+
+      for (let i = 0; i < length; i++) {
+        var geoText = JSON.stringify(disBoxList[i].geoJson);
+        var geoText2 = JSON.parse(geoText);
+        var geoJson = eval("(" + geoText2 + ")");
+        var geo = geoJson.coordinates[0]; // coordinates
+        //console.log(geo); // 第一个包围盒
+
+        self.map.addLayer({
+          id: "boundingbox_dis" + did + "_layer_" + i, // 图层id
+          type: "line",
+          source: {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  geometry: {
+                    type: "Polygon",
+                    coordinates: geo,
+                  },
+                },
+              ],
+            },
+          },
+          layout: {},
+          paint: {
+            "line-color": "#088",
+            "line-width": 1.0,
+          },
+        });
+      }
     });
   },
   methods: {
     init() {
+      let disastertype = [
+        "earthquake",
+        "forestfire",
+        "landslide",
+        "snow",
+        "rainstorm",
+        "typhoon",
+        "vocano",
+        "oceanwave",
+      ];
       let that = this;
 
       mapboxgl.accessToken = mapUrl.MapaccessToken;
@@ -286,6 +305,48 @@ export default {
         interactive: true,
         center: [121.64, 29.7],
         zoom: 4,
+      });
+
+      // 从数据库中搜索得到包围盒，读取所有imageBox框
+      axios({
+        url: that.getImageUrl,
+        method: "get",
+      }).then((res) => {
+        var length = res.data.data.length; // 从数据库共返回了几条记录
+        that.boxResData = res.data.data;
+
+        // for (let i = 0; i < length; i++) {
+        //   var geoText = JSON.stringify(res.data.data[i].geoJson);
+        //   var geoText2 = JSON.parse(geoText);
+        //   var geoJson = eval("(" + geoText2 + ")");
+        //   var geo = geoJson.coordinates[0]; // coordinates
+        //   //console.log(geo); // 第一个包围盒
+
+        //   that.map.addLayer({
+        //     id: "boundingbox" + i,
+        //     type: "line",
+        //     source: {
+        //       type: "geojson",
+        //       data: {
+        //         type: "FeatureCollection",
+        //         features: [
+        //           {
+        //             type: "Feature",
+        //             geometry: {
+        //               type: "Polygon",
+        //               coordinates: geo,
+        //             },
+        //           },
+        //         ],
+        //       },
+        //     },
+        //     layout: {},
+        //     paint: {
+        //       "line-color": "#088",
+        //       "line-width": 1.0,
+        //     },
+        //   });
+        // }
       });
 
       that.map.on("load", function () {
@@ -333,47 +394,6 @@ export default {
         //     ],
         //   },
         // });
-
-        // 从数据库中搜索得到包围盒
-        axios({
-          url: that.getUrl,
-          method: "get",
-        }).then((res) => {
-          var length = res.data.data.length; // 从数据库共返回了几条记录
-
-          for (let i = 0; i < length; i++) {
-            var geoText = JSON.stringify(res.data.data[i].geoJson);
-            var geoText2 = JSON.parse(geoText);
-            var geoJson = eval("(" + geoText2 + ")");
-            var geo = geoJson.coordinates[0]; // coordinates
-            //console.log(geo); // 第一个包围盒
-
-            that.map.addLayer({
-              id: "boundingbox" + i,
-              type: "line",
-              source: {
-                type: "geojson",
-                data: {
-                  type: "FeatureCollection",
-                  features: [
-                    {
-                      type: "Feature",
-                      geometry: {
-                        type: "Polygon",
-                        coordinates: geo,
-                      },
-                    },
-                  ],
-                },
-              },
-              layout: {},
-              paint: {
-                "line-color": "#088",
-                "line-width": 1.0,
-              },
-            });
-          }
-        });
 
         axios.get("/static/Disaster-data/geoJson.json").then((res) => {
           var geoJson = eval("(" + res.data.geoJson + ")"); //eval("(" + res.data.geoJson + ")"); // text转换为json格式
@@ -433,84 +453,82 @@ export default {
         //   });
         // });
 
-        //====================8种灾害的图层===================
-        // 灾害 - 点图层，多种图标
-        //将同一类型数据加载到同一图层
-        
+        // 灾害 - 点图层，8种图标
 
-        // 地震
-        that.map.loadImage(
-          require("../assets/icon/earthquake.png"), //获取地震图标
-          (error, image) => {
-            if (error) throw error;
-            that.map.addImage("earthquake", image);
+        for (let k = 0; k < disastertype.length; k++) {
+          that.map.loadImage(
+            require("../assets/icon/" + disastertype[k] + ".png"), //获取对应图标
+            (error, image) => {
+              if (error) throw error;
+              that.map.addImage(disastertype[k], image);
 
-            //获取相应数据
-            axios({
-              url: that.getdisasterUrl,
-              method: "get",
-            }).then((res) => {
-              var len = res.data.data.length;
-              var dis_data = res.data.data;
+              //获取相应数据
+              axios({
+                url: that.getDisasterUrl,
+                method: "get",
+              }).then((res) => {
+                var len = res.data.data.length;
+                var dis_data = res.data.data;
+                let feature = []; //灾害点数据
 
-              let feature = []; //灾害点数据
+                for (let i = 0; i < len; i++) {
+                  //选择地震类型的数据
+                  if (dis_data[i].dtype == k + 1) {
+                    let geo = []; //单个灾害点位置
+                    let property = []; //单个灾害属性信息
+                    let Coor = new Array(); //单个灾害点位置数据
+                    let des =
+                      "<strong>" +
+                      dis_data[i].name +
+                      "</strong><p>" +
+                      dis_data[i].startTime +
+                      "</p><p>" +
+                      dis_data[i].description +
+                      "</p>"; //单个灾害的描述
 
-              for (let i = 0; i < len; i++) {
-                //选择地震类型的数据
-                if (dis_data[i].dtype == 1) {
-                  let geo = []; //单个灾害点位置
+                    Coor[0] = dis_data[i].lon;
+                    Coor[1] = dis_data[i].lat;
 
-                  let property = []; //单个灾害属性信息
+                    geo.push({
+                      type: "Point",
+                      coordinates: Coor,
+                    });
 
-                  let Coor = new Array(); //单个灾害点位置数据
+                    property.push({
+                      description: des,
+                    });
 
-                  let des = "<strong>" + dis_data[i].name + "</string><p>" + dis_data[i].description + "</p>"; //单个灾害的描述
-
-                  Coor[0] = dis_data[i].lon;
-                  Coor[1] = dis_data[i].lat;
-
-                  geo.push({
-                    type: "Point",
-                    coordinates: Coor,
-                  });
-
-                  property.push({
-                    description: des,
-                  });
-
-                  feature.push({
-                    type: "Festure",
-                    properties: property[0],
-                    geometry: geo[0],
-                  });
+                    feature.push({
+                      type: "Festure",
+                      properties: property[0],
+                      geometry: geo[0],
+                    });
+                  }
                 }
-              }
 
-              let geo = [{ type: "FeatureCollection", features: feature }]; // 所有地震数据
+                let geo = [{ type: "FeatureCollection", features: feature }]; // 所有地震数据
 
-              //将数据转化成json格式
-              let point = JSON.stringify(geo[0]);
-              let point2 = JSON.parse(point);
-              //console.log(point2);
+                //将数据转化成json格式
+                let point = JSON.stringify(geo[0]);
+                let point2 = JSON.parse(point);
 
-              //在map中添加图层
-              that.map.addLayer({
-                id: "earthquake_points",
-                type: "symbol",
-                source: {
-                  type: "geojson",
-                  data: point2,
-                },
-                layout: {
-                  "icon-image": "earthquake",
-                  "icon-size": 0.25,
-                },
+                //在map中添加图层
+                that.map.addLayer({
+                  id: disastertype[k],
+                  type: "symbol",
+                  source: {
+                    type: "geojson",
+                    data: point2,
+                  },
+                  layout: {
+                    "icon-image": disastertype[k],
+                    "icon-size": 0.25,
+                  },
+                });
               });
-            });
-          }
-        );
-
-        
+            }
+          );
+        }
 
         // that.map.addLayer({
         //   id: "testImage",
@@ -578,44 +596,25 @@ export default {
 
       // popup, 对于多个灾害图层
       // rainstorm
-      that.map.on("mouseenter", "rainstorm_points", function (e) {
-        that.map.getCanvas().style.cursor = "pointer";
+      for (let i = 0; i < disastertype.length; i++) {
+        that.map.on("mouseenter", disastertype[i], function (e) {
+          that.map.getCanvas().style.cursor = "pointer";
 
-        var coordinates = e.features[0].geometry.coordinates.slice();
-        var description = e.features[0].properties.description;
+          var coordinates = e.features[0].geometry.coordinates.slice();
+          var description = e.features[0].properties.description;
 
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
-        popup.setLngLat(coordinates).setHTML(description).addTo(that.map);
-      });
+          popup.setLngLat(coordinates).setHTML(description).addTo(that.map);
+        });
 
-      that.map.on("mouseleave", "rainstorm_points", function () {
-        that.map.getCanvas().style.cursor = "";
-        popup.remove();
-      });
-
-      // landslide
-      that.map.on("mouseenter", "landslide_points", function (e) {
-        that.map.getCanvas().style.cursor = "pointer";
-
-        var coordinates = e.features[0].geometry.coordinates.slice();
-        var description = e.features[0].properties.description;
-
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        popup.setLngLat(coordinates).setHTML(description).addTo(that.map);
-      });
-
-      that.map.on("mouseleave", "landslide_points", function () {
-        that.map.getCanvas().style.cursor = "";
-        popup.remove();
-      });
-
-      // earthquake
+        that.map.on("mouseleave", disastertype[i], function () {
+          that.map.getCanvas().style.cursor = "";
+          popup.remove();
+        });
+      }
     },
     updateArea(e) {
       //debugger;
@@ -662,5 +661,3 @@ export default {
 
 <style scoped>
 </style>
-
-

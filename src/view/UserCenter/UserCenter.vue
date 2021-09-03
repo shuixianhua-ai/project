@@ -6,6 +6,11 @@
         <i v-else class="el-icon-s-unfold"></i>
         <span>Hello, {{ this.username }}!</span>
       </div>
+      <div style="float: right;align-items: center;padding-top: 15px; padding-right: 3%" v-if="commonUser">
+        <el-tooltip class="item" effect="dark" content="Request for permission to post an article" placement="bottom">
+          <el-button type="primary" @click="requestPostAuth">Authentication</el-button>
+        </el-tooltip>
+      </div>
     </div>
     <div class="sidebar">
       <el-menu
@@ -19,12 +24,20 @@
         style="text-align: left; height: 1050px; border-right: none"
       >
         <el-menu-item index="/UserCenter/Profile">
-          <i class="el-icon-s-tools"></i>
+          <i class="el-icon-user"></i>
           <span>Profile</span>
         </el-menu-item>
         <el-menu-item index="/UserCenter/ManagerPassword">
-          <i class="el-icon-s-tools"></i>
-          <span>ManagerPassword</span>
+          <i class="el-icon-key"></i>
+          <span>Manager Password</span>
+        </el-menu-item>
+        <el-menu-item index="/UserCenter/Audit" v-if="adminUser">
+          <i class="el-icon-coordinate"></i>
+          <span>Application Audit</span>
+        </el-menu-item>
+        <el-menu-item index="/UserCenter/DisasterTable" v-if="adminUser">
+          <i class="el-icon-map-location"></i>
+          <span>Disaster Audit</span>
         </el-menu-item>
       </el-menu>
     </div>
@@ -40,12 +53,55 @@ export default {
   data () {
     return {
       collapse: false,
-      username: storage['username']
+      username: storage['username'],
+      commonUser: false,
+      adminUser: false,
+      authUser: false
     }
   },
   methods: {
     collapseChange () {
       this.collapse = !this.collapse
+    },
+    requestPostAuth () {
+      console.log(storage['token'])
+      this.$axios({
+        method: 'get',
+        url: 'http://116.62.228.138:10003/users/authentication',
+        headers: {
+          'token': storage['token']
+        },
+        params: {
+          mailAddr: storage['email']
+        }
+      })
+        .then(res => {
+          console.log(res)
+          if (res.data.state === true) {
+            this.$notify({
+              title: 'Success',
+              message: 'Waiting for approval',
+              type: 'success',
+              offset: 100
+            })
+          } else {
+            this.$notify.error({
+              title: 'Error',
+              message: res.data.msg,
+              offset: 100
+            })
+          }
+        })
+    }
+  },
+  mounted () {
+    console.log(storage['type'])
+    if (storage['type'] === '0') {
+      this.commonUser = true
+    } else if (storage['type'] === '1') {
+      this.authUser = true
+    } else if (storage['type'] === '2') {
+      this.adminUser = true
     }
   }
 }
