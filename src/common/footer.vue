@@ -1,10 +1,10 @@
 <template>
-<footer :class="{footerSticky:footer_fixed}">
+<footer>
   <el-row class="row-footer" type="flex" justify="center">
 
     <el-col :span="4">
       <div class="logo">
-        <img src="../assets/pictures/MainPage-img/浙大logo.png">
+        <img src="../assets/pictures/MainPage-img/ZJUlogo.png">
     </div>
     </el-col>
 
@@ -42,15 +42,16 @@ export default {
 </script>
 
 <style scoped>
-.footerSticky {
-  padding: 5px 70px;
-  /* background: #fff; */
-}
-.row-footer{
-  font-weight: normal;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f8f7f7;
-}
+      .footerSticky 
+      {
+        padding: 5px 70px;
+        /* background: #fff; */
+      }
+      .row-footer{
+        font-weight: normal;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f8f7f7;
+      }
     .footer .fri-link select {
         width: 250px;
         height: 30px;

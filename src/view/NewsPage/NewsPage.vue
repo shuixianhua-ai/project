@@ -8,7 +8,7 @@
     <el-carousel type="card">
       <el-carousel-item  v-for="item in newsArray.slice(0, 3)" :key="item.nid">
         <el-card style="background-color: #a7a7a7">
-      <img  @click="gotoNews(newsArray.indexOf(item))" :src="imgurl[newsArray.indexOf(item)]" height="200px" class="image"> <!--获取轮播图图片url -->
+      <img  @click="gotoNews(newsArray.indexOf(item))" style="width: 200px, height: 200px" :src="imgurl[newsArray.indexOf(item)]" class="images"> <!--获取轮播图图片url -->
       <div style="padding: 14px;">
         <!-- 跳转到新闻详细页面 -->
         <router-link
@@ -328,5 +328,8 @@ el-carousel-item{
 el-carousel {
   cursor: pointer;
 }
-
+.images {
+  /* width: 400px; */
+  height: 220px;
+}
 </style>

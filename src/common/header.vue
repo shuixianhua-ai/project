@@ -1,7 +1,8 @@
 <template>
   <header :class="{headerSticky:header_fixed}">
     <a href="#" class="logo" :class="{logoSticky:header_fixed}">
-      <img src="../../src/assets/pictures/MainPage-img/logo.png" height="85px" width="auto">
+      <img src="../../src/assets/pictures/logo_black.png" height="85px" width="auto" v-if="header_fixed">
+      <img src="../../src/assets/pictures/logo_white.png" height="85px" width="auto" v-if="!header_fixed">
     </a>
     <a href="#" class="logo" :class="{logoSticky:header_fixed}">
       International disaster data and information service
@@ -127,7 +128,7 @@ header {
   justify-content: space-between;
   align-items: center;
   transition: 0.6s;
-  padding: 40px 20px;
+  padding: 20px 20px;
   z-index: 100000;
 }
 

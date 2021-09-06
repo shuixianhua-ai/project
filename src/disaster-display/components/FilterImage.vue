@@ -30,7 +30,7 @@
 
     <div style="margin: 15px 0"></div>
     <div>
-      <el-button round @click="queryInfoClick">Summit</el-button>
+      <el-button round @click="queryInfoClick">Submit</el-button>
       <el-button round @click="queryInfoClear">Clear Results</el-button>
     </div>
     <div style="margin: 15px 0"></div>
@@ -45,7 +45,7 @@
         <el-card :body-style="{ padding: '5px' }">
           <img
             height="90px"
-            :src="require('../assets/raster/' + img.name + '.jpg')"
+            :src="require('../assets/raster/img-' + img.mid + '.jpg')"
             class="image"
           />
           <div class="infodisplay" style="padding: 10px">
@@ -91,7 +91,7 @@
               type="info"
               icon="el-icon-download"
               circle
-              @click="downloadClick(img.name)"
+              @click="downloadClick(img.name, img.mid)"
               plain
             ></el-button>
             <el-button
@@ -107,6 +107,16 @@
         <div style="margin: 15px 0"></div>
       </el-col>
     </el-row>
+
+    <el-dialog :visible.sync="dialogVisible" width="25%">
+      <div style="margin: 5px 0"></div>
+      <el-tabs type="border-card">
+        Please select a <strong>ACTIVATION OF DISASTER</strong> to search for
+        images!<br />
+        <br />
+        (Default - Activation 1)</el-tabs
+      >
+    </el-dialog>
   </div>
 </template>
 
@@ -115,6 +125,7 @@ import filterModel from "./FilterModel";
 
 import filterTime2 from "./Filter-image-time.vue";
 import bus from "./eventBus";
+import axios from "axios";
 
 export default {
   name: "filterOfPictures",
@@ -125,63 +136,22 @@ export default {
       selectionContent2: [], //resolution
       selectionContent3: [], //satellite
       selectionTime: [], //time
+      focusDisaster: 0, //当前页面关注的灾害id
+      disasterdate:"2020-01-01 01:00:03",
+      dialogVisible: false,
       imgList: [
         //resolution 1-5分别对应very low,low,medium,high,very high
-        {
-          id: 0,
-          name: "img1",
-          sensor: "Optical",
-          resolution: "Medium",
-          satellite: "LANDSAT7",
-          date: "2019-12-29,13:00:54",
-          imgDisplay: false,
-          boundingBox: false,
-          isdisplay: false,
-        },
-        {
-          id: 1,
-          name: "img2",
-          sensor: "Optical",
-          resolution: "Medium",
-          satellite: "GF",
-          date: "2020-01-01,01:00:03",
-          imgDisplay: false,
-          boundingBox: false,
-          isdisplay: false,
-        },
-        {
-          id: 2,
-          name: "img3",
-          sensor: "Radar",
-          resolution: "Low",
-          satellite: "LANDSAT8",
-          date: "2020-01-08,17:09:56",
-          imgDisplay: false,
-          boundingBox: false,
-          isdisplay: false,
-        },
-        {
-          id: 3,
-          name: "img4",
-          sensor: "Optical",
-          resolution: "Very Low",
-          satellite: "SENTINEL_1A",
-          date: "2020-01-13,00:08:48",
-          imgDisplay: false,
-          boundingBox: false,
-          isdisplay: false,
-        },
-        {
-          id: 4,
-          name: "img5",
-          sensor: "Radar",
-          resolution: "Very High",
-          satellite: "TANDEM_X",
-          date: "2020-01-20,12:00:00",
-          imgDisplay: false,
-          boundingBox: false,
-          isdisplay: false,
-        },
+        // {
+        //   id: 0,
+        //   name: "img1",
+        //   sensor: "Optical",
+        //   resolution: "Medium",
+        //   satellite: "LANDSAT7",
+        //   date: "2019-12-29,13:00:54",
+        //   imgDisplay: false,
+        //   boundingBox: false,
+        //   isdisplay: false,
+        // }
       ],
       SensorOptions: ["Optical", "Radar"],
       ResolutionOptions: ["Very High", "High", "Medium", "Low", "Very Low"],
@@ -214,63 +184,120 @@ export default {
       ],
     };
   },
+  mounted() {
+    
+    this.init();
+    var self = this;
+    bus.$on("ImageOfDisaster", function (did,date) {
+      self.focusDisaster = did;
+      self.disasterdate=date;
+      //console.log(self.focusDisaster);
+    });
+    
+    
+  },
   methods: {
     // 对 imgList 添加影像列表
     init() {
+      
       axios({
-        url: "http://116.62.228.138:10003/images/GetImages", // 获取所有Disaster_response
+        url: "http://116.62.228.138:10003/images/GetImages", // 获取所有image
         method: "get",
       }).then((res) => {
         var len = res.data.data.length;
         var img_data = res.data.data;
-        //
-        // img_data = img_data.filter((item) => item.geoJson != null);
 
-        // let totalNum = 0;
-        // for (var i = len - 1; i >= 0; i--) {
-        //   this.DisasterList.push({
-        //     id: ++totalNum, // 在项目中的disaster-id，从1起始
-        //     did: dis_data[i].did, // 原始 disaster-id
-        //     name: dis_data[i].name,
-        //     type: dis_data[i].tag,
-        //     country: dis_data[i].country,
-        //     location: [dis_data[i].lon, dis_data[i].lat],
-        //     date: dis_data[i].startTime,
-        //     description: dis_data[i].description,
-        //     sponsor: dis_data[i].sponsor,
-        //     responsor: dis_data[i].responsor,
-        //     geojson: dis_data[i].aoijson,
-        //     isdisplay_type: true,
-        //     isdisplay_time: true,
-        //     isdisplay_country: true,
-        //     isdisplay: true,
-        //   });
-        //   console.log(dis_data[i].did);
-        // }
-        // this.DisasterList.sort(compare("id"));
+        img_data = img_data.filter((item) => item.geoJson != null);
+
+        let totalNum = 0;
+        
+        //console.log(this.disasterdate);
+        for (let i = 0; i < len; i++) {
+          // 对数据库内属性进行转换
+
+          // 分辨率
+          let temp_resolution;
+          if (img_data[i].resolution <= 1) {
+            temp_resolution = "Very High";
+          } else if (img_data[i].resolution <= 10) {
+            temp_resolution = "High";
+          } else if (img_datat[i].resolution <= 50) {
+            temp_resolution = "Medium";
+          } else if (img_data[i].resolution <= 100) temp_resolution = "Low";
+          else temp_resolution = "Very Low";
+
+          // 传感器
+          let temp_sensor;
+          if (img_data[i].platformName == "Sentinel-2") {
+            temp_sensor = "Optical";
+          } else {
+            temp_satellite = "Radar";
+          }
+
+          // 卫星
+          let temp_satellite;
+          if (img_data[i].platformName == "Sentinel-2") {
+            temp_satellite = "SENTINEL_2B";
+          } else {
+            temp_satellite = "Unknown";
+          }
+
+          // 时间
+          let temp_date;
+          temp_date = img_data[i].date.substring(0, 19);
+
+          // 包围盒
+          let geoText = JSON.stringify(img_data[i].geoJson);
+          let geoText2 = JSON.parse(geoText);
+          let geoJson = eval("(" + geoText2 + ")");
+          let geo = geoJson.coordinates[0]; // coordinates
+
+          // 将数据库内的影像添加至imgList
+          this.imgList.push({
+            id: ++totalNum, // id从1开始
+            name: "img" + totalNum,
+            mid: img_data[i].mid,
+            did: img_data[i].did,
+            sensor: temp_sensor,
+            satellite: temp_satellite,
+            resolution: temp_resolution,
+            date: img_data[i].date.toString().substr(0,19), // temp_date
+            boxgeo: geo,
+            imgDisplay: false,
+            boundingBox: false, // true
+            //isdownload: img_data[i].downloadState,
+            isdisplay: false,
+          });
+        }
+        //this.imgList.sort(compare("id")); //  按id排序
+
+        //过滤得到disaster_id为当前灾害的遥感影像
       });
     },
     sendImgFlag(id) {
       // 切换地图上相应img的可见性
-      this.imgList[id].imgDisplay = !this.imgList[id].imgDisplay;
-      bus.$emit("MainpageImg", id, this.imgList[id].imgDisplay, this.imgList);
+      this.imgList[id - 1].imgDisplay = !this.imgList[id - 1].imgDisplay;
+      bus.$emit("MainpageImg", id, this.imgList);
     },
     sendBoxFlag(id) {
       // 切换地图上相应影像包围盒的可见性
-      this.imgList[id].boundingBox = !this.imgList[id].boundingBox;
+      this.imgList[id - 1].boundingBox = !this.imgList[id - 1].boundingBox;
       bus.$emit("MainpageBox", this.imgList);
     },
     sendLocFlag(id) {
-      bus.$emit("MainpageLoc", id);
+      let boxgeo = this.imgList[id - 1].boxgeo;
+      bus.$emit("MainpageLoc", boxgeo, id);
     },
     handleChange(val) {
       console.log(val);
     },
-    downloadClick(value) {
+    downloadClick(name, mid) {
       //img下载
       var link = document.createElement("a");
-      link.download = value;
-      link.href = require("../assets/raster/" + value + ".jpg");
+      //link.download = name;
+      link.href =
+        "http://116.62.228.138:10003/file/downloadfile?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
+      //link.href = "http://116.62.228.138:10003/file/downloadfile?" + mid;
       link.click();
       link.remove();
     },
@@ -286,6 +313,7 @@ export default {
     },
     getSelectionTime2(selection) {
       this.selectionTime2 = selection;
+      //console.log(this.selectionTime2);
     },
     queryInfoClear() {
       for (var i = 0; i < this.imgList.length; i++)
@@ -295,11 +323,16 @@ export default {
       this.$refs.filtermodel3.handleCheckAllChange(false);
     },
     queryInfoClick() {
+      if (this.focusDisaster == 0) {
+        this.dialogVisible = true;
+      }
+
       for (var i = 0; i < this.imgList.length; i++) {
-        var f1 = 0;
-        var f2 = 0;
-        var f3 = 0;
-        var f4 = 0;
+        var f1 = 0; // 过滤传感器类型为所选条件
+        var f2 = 0; // 过滤分辨率为所选条件
+        var f3 = 0; // 过滤卫星类型为所选条件
+        var f4 = 0; // 过滤拍摄时间为所选时间区间
+        var f5 = 0; // 过滤当前所选灾害的相关影像
         if (this.selectionContent1.length > 0) {
           for (var j = 0; j < this.selectionContent1.length; j++) {
             if (this.imgList[i].sensor == this.selectionContent1[j]) {
@@ -317,7 +350,7 @@ export default {
           }
         } else f2 = 1;
         if (this.selectionContent3.length > 0) {
-          console.log(this.selectionContent3.length);
+          //console.log(this.selectionContent3.length);
           for (var j = 0; j < this.selectionContent3.length; j++) {
             if (this.imgList[i].satellite == this.selectionContent3[j]) {
               f3 = 1;
@@ -350,7 +383,12 @@ export default {
           }
         } else f4 = 1;
 
-        if (f1 == 1 && f2 == 1 && f3 == 1 && f4 == 1)
+        // 按是否为当前所选的灾害id过滤
+        if (this.imgList[i].did == this.focusDisaster) {
+          f5 = 1;
+        }
+
+        if (f1 == 1 && f2 == 1 && f3 == 1 && f4 == 1 && f5 == 1)
           this.imgList[i].isdisplay = true;
         else this.imgList[i].isdisplay = false;
       }
@@ -392,6 +430,8 @@ export default {
   background-image: url(../assets/icon/button_info.png);
   background-repeat: no-repeat;
   background-size: 13px 13px;
+  position: relative;
+  bottom: 5px;
 }
 .subcollapse >>> .el-collapse-item__header {
   height: 24px;

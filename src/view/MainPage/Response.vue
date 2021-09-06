@@ -132,6 +132,7 @@ export default {
       var responseLayers = document.getElementById('menu');
       responseLayers.appendChild(link);
       },
+    //判断用户是否有发起权限
     dtype(tag){
       switch (tag){
                 case 'Earthquake':
@@ -164,6 +165,7 @@ export default {
             
       } 
     },
+    //初始化表单
     handleClose () {
       this.$refs.responseForm.resetFields()
       this.responseForm={
@@ -181,6 +183,7 @@ export default {
           aoijson:''
       }
     },
+     //提交表单
      response (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {

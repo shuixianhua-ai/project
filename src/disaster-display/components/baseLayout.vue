@@ -1,9 +1,5 @@
 <template>
   <div id="baseLayout">
-    <div>
-      <p style="color: red">Num：{{ myIndex }}</p>
-      <p>{{ msg }}</p>
-    </div>
     <el-container>
       <!-- <el-header>Header</el-header> -->
       <el-header style="padding: 0 20px">
@@ -50,18 +46,11 @@
       <!-- 以空白footer组件的形式留出页边距 -->
       <el-footer style="height: 20px"></el-footer>
     </el-container>
-    <!-- test code -->
-    <div>
-      <p style="color: red">Num：{{ myIndex }}</p>
-      <p>{{ msg }}</p>
-    </div>
-    <!-- test code -->
   </div>
 </template>
 
 <script>
 import mainmap from "./mainpage";
-import headOfPage from "./Header";
 import filterOfPictures from "./FilterImage";
 import filterOfDisaster from "./FilterDisaster.vue";
 import productofPage from "./Products";
@@ -73,17 +62,15 @@ export default {
     return {
       activeName1: "Activation",
       tagcontentheight: "", //作为传递动态获取浏览器页面高度的参数
-      msg: "", //test code
-      // 保存传递过来的index
-      myIndex: "", //test code
+      msg: "",
+      myIndex: "",
     };
   },
   mounted() {
     this.init();
 
-    this.msg = this.$route.params.msgKeyOne; //test code
-    this.myIndex = this.$route.query.id; //test code
-    console.log(this.myIndex, "baskfrrjrjrj "); //test code
+    this.msg = this.$route.params.msgKeyOne;
+    this.myIndex = this.$route.query.id;
   },
   methods: {
     init() {
@@ -97,7 +84,6 @@ export default {
   },
   components: {
     mainmap: mainmap,
-    headOfPage: headOfPage,
     filterOfPictures: filterOfPictures,
     filterOfDisaster: filterOfDisaster,
     productofPage: productofPage,

@@ -139,28 +139,23 @@ export default {
     var self = this;
 
     // 点击影像按钮，切换相应影像可见性
-    bus.$on("MainpageImg", function (id, flag, imageList) {
+    bus.$on("MainpageImg", function (id, imageList) {
       for (let i = 0; i < imageList.length; i++) {
         let tempId = "Img" + (i + 1);
         let tempUrl, boxcoord;
-        if (i == 3) {
-          tempUrl = "api/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d"; //"http://116.62.228.138:10003/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
+        let imgRoute = imageList[i].mid;
+
+        tempUrl = "api/preview?id=" + imgRoute; //"http://116.62.228.138:10003/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
+
+        if (imageList[i].did > 0) {
           boxcoord = [
-            [7.6875885, 46.858175958],
-            [9.128057161, 46.865628248],
-            [9.130470362, 47.853627712],
             [7.66286529, 47.845914827],
-          ];
-          console.log(tempUrl);
-        } else {
-          tempUrl = require("../assets/img/img" + (i + 1) + ".gif");
-          boxcoord = [
-            [-80.425, 46.437],
-            [-71.516, 46.437],
-            [-71.516, 37.936],
-            [-80.425, 37.936],
+            [9.130470362, 47.853627712],
+            [9.128057161, 46.865628248],
+            [7.6875885, 46.858175958],
           ];
         }
+
         if (imageList[i].imgDisplay == true) {
           if (!self.map.getLayer(tempId)) {
             self.map.addLayer({
@@ -189,24 +184,34 @@ export default {
 
       for (let i = 0; i < imageList.length; i++) {
         let tempId = "boxJson" + (i + 1);
-        let tempRoute = "/static/boundingBox/imgBox" + (i + 1) + ".json";
+        let boxgeo = imageList[i].boxgeo;
 
         if (imageList[i].boundingBox == true) {
           if (!self.map.getLayer(tempId)) {
-            axios.get(tempRoute).then((res) => {
-              self.map.addLayer({
-                id: tempId,
-                type: "line",
-                source: {
-                  type: "geojson",
-                  data: res.data,
+            // 添加该影像的包围盒
+            self.map.addLayer({
+              id: tempId,
+              type: "line",
+              source: {
+                type: "geojson",
+                data: {
+                  type: "FeatureCollection",
+                  features: [
+                    {
+                      type: "Feature",
+                      geometry: {
+                        type: "Polygon",
+                        coordinates: boxgeo,
+                      },
+                    },
+                  ],
                 },
-                layout: {},
-                paint: {
-                  "line-color": "#088",
-                  "line-width": 1.0,
-                },
-              });
+              },
+              layout: {},
+              paint: {
+                "line-color": "#088",
+                "line-width": 1.0,
+              },
             });
           } else {
             self.map.setLayoutProperty(
@@ -224,18 +229,13 @@ export default {
       }
     });
 
-    bus.$on("MainpageLoc", function (id) {
+    bus.$on("MainpageLoc", function (boxgeo, id) {
       // 根据影像包围盒位置，使其位于地图中央
+      let x = boxgeo[0][0][0];
+      let y = boxgeo[0][0][1];
 
-      var route = "/static/boundingBox/imgBox" + (id + 1) + ".json";
-      axios.get(route).then((res) => {
-        var coorArray = res.data.features[0].geometry.coordinates;
-        var xmid = (coorArray[0][0][0] + coorArray[0][1][0]) / 2;
-        var ymid = (coorArray[0][0][1] + coorArray[0][2][1]) / 2;
-
-        self.map.flyTo({
-          center: [xmid, ymid],
-        });
+      self.map.flyTo({
+        center: [x, y],
       });
     });
 
@@ -247,41 +247,40 @@ export default {
         center: loc,
       });
 
-      var disBoxList = self.boxResData.filter((item) => item.did === did); // 该灾害下的影像框  --  影像框图层只要保持一致即可
-      let length = disBoxList.length;
+      // var disBoxList = self.boxResData.filter((item) => item.did === did); // 该灾害下的影像框  --  影像框图层只要保持一致即可
+      // let length = disBoxList.length;
 
-      for (let i = 0; i < length; i++) {
-        var geoText = JSON.stringify(disBoxList[i].geoJson);
-        var geoText2 = JSON.parse(geoText);
-        var geoJson = eval("(" + geoText2 + ")");
-        var geo = geoJson.coordinates[0]; // coordinates
-        //console.log(geo); // 第一个包围盒
+      // for (let i = 0; i < length; i++) {
+      //   var geoText = JSON.stringify(disBoxList[i].geoJson);
+      //   var geoText2 = JSON.parse(geoText);
+      //   var geoJson = eval("(" + geoText2 + ")");
+      //   var geo = geoJson.coordinates[0]; // coordinates
 
-        self.map.addLayer({
-          id: "boundingbox_dis" + did + "_layer_" + i, // 图层id
-          type: "line",
-          source: {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  geometry: {
-                    type: "Polygon",
-                    coordinates: geo,
-                  },
-                },
-              ],
-            },
-          },
-          layout: {},
-          paint: {
-            "line-color": "#088",
-            "line-width": 1.0,
-          },
-        });
-      }
+      //   self.map.addLayer({
+      //     id: "boundingbox_dis" + did + "_layer_" + i, // 图层id
+      //     type: "line",
+      //     source: {
+      //       type: "geojson",
+      //       data: {
+      //         type: "FeatureCollection",
+      //         features: [
+      //           {
+      //             type: "Feature",
+      //             geometry: {
+      //               type: "Polygon",
+      //               coordinates: geo,
+      //             },
+      //           },
+      //         ],
+      //       },
+      //     },
+      //     layout: {},
+      //     paint: {
+      //       "line-color": "#088",
+      //       "line-width": 1.0,
+      //     },
+      //   });
+      // }
     });
   },
   methods: {
@@ -395,35 +394,36 @@ export default {
         //   },
         // });
 
-        axios.get("/static/Disaster-data/geoJson.json").then((res) => {
-          var geoJson = eval("(" + res.data.geoJson + ")"); //eval("(" + res.data.geoJson + ")"); // text转换为json格式
-          var geo = geoJson.coordinates[0];
+        // 获取本地包围盒
+        // axios.get("/static/Disaster-data/geoJson.json").then((res) => {
+        //   var geoJson = eval("(" + res.data.geoJson + ")"); //eval("(" + res.data.geoJson + ")"); // text转换为json格式
+        //   var geo = geoJson.coordinates[0];
 
-          that.map.addLayer({
-            id: "boundingbox_test",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: {
-                type: "FeatureCollection",
-                features: [
-                  {
-                    type: "Feature",
-                    geometry: {
-                      type: "Polygon",
-                      coordinates: geo,
-                    },
-                  },
-                ],
-              },
-            },
-            layout: {},
-            paint: {
-              "line-color": "#088",
-              "line-width": 1.0,
-            },
-          });
-        });
+        //   that.map.addLayer({
+        //     id: "boundingbox_test",
+        //     type: "line",
+        //     source: {
+        //       type: "geojson",
+        //       data: {
+        //         type: "FeatureCollection",
+        //         features: [
+        //           {
+        //             type: "Feature",
+        //             geometry: {
+        //               type: "Polygon",
+        //               coordinates: geo,
+        //             },
+        //           },
+        //         ],
+        //       },
+        //     },
+        //     layout: {},
+        //     paint: {
+        //       "line-color": "#088",
+        //       "line-width": 1.0,
+        //     },
+        //   });
+        // });
 
         // 读取数据库内的包围盒 geojson文件，加载要素
         // axios.get("/static/Disaster-data/boundingbox.json").then((res) => {
@@ -530,6 +530,7 @@ export default {
           );
         }
 
+        // 添加图层
         // that.map.addLayer({
         //   id: "testImage",
         //   type: "raster",
@@ -632,28 +633,18 @@ export default {
       //     "fill-outline-color": "#0e2944",
       //   },
       // });
-      //this.draw.delete(e.features[0].id);   // 删除所绘制feature的
+      //this.draw.delete(e.features[0].id);   // 删除所绘制feature
 
       // console.log(this.draw.getAll());
 
       var aoi = this.draw.getAll();
       if (aoi.features.length > 0) {
         var convertedData = aoi.features[0].geometry.coordinates[0]; // 一串坐标点
-        console.log(convertedData);
       }
 
       var result = this.map.queryRenderedFeatures(null, {
         layers: ["rainstorm_points"], //.filter((layer) => {this.map.getLayer(layer);}),
       });
-
-      console.log(
-        "if layer exists:   " + this.map.getLayer("rainstorm_points")
-      );
-      if (result.length > 0) {
-        console.log("result:   " + result[0].geometry.coordinates);
-      } else {
-        console.log("no result");
-      }
     },
   },
 };

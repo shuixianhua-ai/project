@@ -1,7 +1,7 @@
 <template>
   <div id="product">
     <el-table
-      :data="tableData"
+      :data="showData"
       ref="multipleTable"
       @selection-change="handleSelectionChange"
       style="width: 100%"
@@ -104,6 +104,9 @@
 </template>
 
 <script>
+import bus from "./eventBus";
+import axios from "axios";
+
 export default {
   name: "productofPage",
   data() {
@@ -112,51 +115,53 @@ export default {
       dialogVisible: false,
       multipleTable: [],
       desOfCarousel: [],
+      focusDisaster: 1,
       tableData: [
-        {
-          id: "1",
-          did: "1",
-          date: "2016-05-02",
-          name: "Product1",
-          disaster: "Forest Fire",
-          sponsor:
-            "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
-          producer: "China Group on Earth Observations(GEO)",
-          description:
-            "Product1 —— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
-        },
-        {
-          id: "2",
-          did: "1",
-          date: "2016-07-04",
-          name: "Product2",
-          disaster: "Flood",
-          sponsor:
-            "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
-          producer: "China Group on Earth Observations(GEO)",
-          description: "Product2 ……",
-        },
-        {
-          id: "3",
-          did: "2",
-          date: "2016-08-01",
-          name: "Product3",
-          disaster: "Typhoon",
-          sponsor: "UNITAR on behalf of UNOCHA",
-          producer: "China Group on Earth Observations(GEO)",
-          description: "Product3 ……",
-        },
-        {
-          id: "4",
-          did: "2",
-          date: "2016-12-03",
-          name: "Product4",
-          disaster: "Snow storm",
-          sponsor: "UNITAR on behalf of UNOCHA",
-          producer: "China Group on Earth Observations(GEO)",
-          description: "Product4 ……",
-        },
+        // {
+        //   id: "1",
+        //   did: "1",
+        //   date: "2016-05-02",
+        //   name: "Product1",
+        //   disaster: "Forest Fire",
+        //   sponsor:
+        //     "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+        //   producer: "China Group on Earth Observations(GEO)",
+        //   description:
+        //     "Product1 —— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
+        // },
+        // {
+        //   id: "2",
+        //   did: "1",
+        //   date: "2016-07-04",
+        //   name: "Product2",
+        //   disaster: "Flood",
+        //   sponsor:
+        //     "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
+        //   producer: "China Group on Earth Observations(GEO)",
+        //   description: "Product2 ……",
+        // },
+        // {
+        //   id: "3",
+        //   did: "2",
+        //   date: "2016-08-01",
+        //   name: "Product3",
+        //   disaster: "Typhoon",
+        //   sponsor: "UNITAR on behalf of UNOCHA",
+        //   producer: "China Group on Earth Observations(GEO)",
+        //   description: "Product3 ……",
+        // },
+        // {
+        //   id: "4",
+        //   did: "2",
+        //   date: "2016-12-03",
+        //   name: "Product4",
+        //   disaster: "Snow storm",
+        //   sponsor: "UNITAR on behalf of UNOCHA",
+        //   producer: "China Group on Earth Observations(GEO)",
+        //   description: "Product4 ……",
+        // },
       ],
+      showData: [], // 展示所选灾害的Product data
     };
   },
   created() {
@@ -164,14 +169,54 @@ export default {
   },
   watch: {
     multipleTable(o, n) {
-      // console.log(o[0].description);
       if (o.length > 0) this.desOfCarousel = o[0].description;
       else this.desOfCarousel = [];
     },
     deep: true,
     immediate: true,
   },
+  mounted() {
+    this.init();
+
+    var self = this;
+    bus.$on("ProductOfDisaster", function (did) {
+      self.focusDisaster = did;
+
+      self.showData = [];
+      for (let i = 0; i < self.tableData.length; i++) {
+        if (self.tableData[i].did == did) {
+          self.showData.push(self.tableData[i]);
+        }
+      }
+    });
+  },
   methods: {
+    init() {
+      axios({
+        url: "http://localhost:10003/disasterProduct/GetProducts", // 获取所有Product
+        method: "get",
+      }).then((res) => {
+        var len = res.data.data.length;
+        var product_data = res.data.data;
+        let totalNum = 0;
+        product_data = product_data.filter((item) => item.description != null);
+        for (let i = 0; i < len; i++) {
+          let id = product_data[i].id;
+          this.tableData.push({
+            id: id,
+            did: product_data[i].did,
+            date: product_data[i].date,
+            name: "Product" + id,
+            disaster: product_data[i].disaster,
+            sponsor: product_data[i].sponsor,
+            producer: product_data[i].producer,
+            description: product_data[i].description,
+          });
+        }
+
+        this.showData = this.tableData;
+      });
+    },
     handleClick(tab, event) {
       // console.log(tab, event);
     },

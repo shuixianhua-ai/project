@@ -15,6 +15,9 @@
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Response from './Response'
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import axios from "axios";
+import mapUrl from "../util/mapUrl";
 let storage = window.localStorage
 
 export default {
@@ -23,18 +26,28 @@ export default {
   data () {
     return {
       type:storage['type'],
-      datasource: {}
+      datasource: {},
+      getImageUrl: "http://116.62.228.138:10003/images/GetImages",
+      getDisasterUrl: "http://116.62.228.138:10003/disasterResponse/disasterGetAll",
     }
   },
   mounted () {
     this.init()
   },
   methods: {
-    loadData () {
-      console.log(storage['type'], 2222)
-      // console.log(datasource)
-    },
+    
     init () {
+      //灾害数组
+      let disastertype = [
+        "earthquake",
+        "forestfire",
+        "landslide",
+        "snow",
+        "rainstorm",
+        "typhoon",
+        "vocano",
+        "oceanwave",
+      ];
       var url = 'https://webapi.amap.com/maps?v=1.4.15&key=69af142a5df4feb0d3149bd89f2a0901&callback=onLoad';
       var jsapi = document.createElement('script');
       jsapi.charset = 'utf-8';
@@ -45,14 +58,13 @@ export default {
         url: 'http://116.62.228.138:10003/disasterResponse/disasterGetAll'
       })
         .then(res => {
-          console.log(res.data.data, 'data.data')
+          // console.log(res.data.data, 'data.data')
           mydata.datasource = res.data.data
-          // console.log(mydata.datasource, 'datasource1')
-          mystorage=res.data.data
         })
-      mapboxgl.accessToken =
-        'pk.eyJ1IjoiaHVkYW53ZWkiLCJhIjoiY2tyZDNmbGY4NTgzZjJxbzZnem1zZ21yNCJ9.WR-eaeODn3yE84w_wyvg1Q'
+
+      mapboxgl.accessToken = 'pk.eyJ1IjoiaHVkYW53ZWkiLCJhIjoiY2tyZDNmbGY4NTgzZjJxbzZnem1zZ21yNCJ9.WR-eaeODn3yE84w_wyvg1Q'
       let localhost = window.location.origin
+      //设置地图数据源
       let sources = {
         'osm-tiles1': {
           'type': 'raster',
@@ -80,9 +92,9 @@ export default {
         'source': 'osm-tiles2'
       }
       ]
+      //引入地图变量
       var map = new mapboxgl.Map({
         container: 'map',
-        // style: 'mapbox://styles/mapbox/dark-v10',
         zoom: 1.35,
         maxZoom:1.5,
         minZoom:1.2,
@@ -98,165 +110,145 @@ export default {
         }
         
       })
-      // mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.1.0/mapbox-gl-rtl-text.js');
-      // map.addControl(new MapboxLanguage({
-      //       defaultLanguage: 'en'
-      //   }));
-
-      var size = 200
-
-      var pulsingDot = {
-        width: size,
-        height: size,
-        data: new Uint8Array(size * size * 4),
-
-        onAdd: function () {
-          var canvas = document.createElement('canvas')
-          canvas.width = this.width
-          canvas.height = this.height
-          this.context = canvas.getContext('2d')
-        },
-
-        render: function () {
-          var duration = 1000
-          var t = (performance.now() % duration) / duration
-
-          var radius = (size / 2) * 0.3
-          var outerRadius = (size / 2) * 0.7 * t + radius
-          var context = this.context
-
-          // draw outer circle
-          context.clearRect(0, 0, this.width, this.height)
-          context.beginPath()
-          context.arc(
-            this.width / 2,
-            this.height / 2,
-            outerRadius,
-            0,
-            Math.PI * 2
-          )
-          context.fillStyle = 'rgba(255, 200, 200,' + (1 - t) + ')'
-          context.fill()
-
-          // draw inner circle
-          context.beginPath()
-          context.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2)
-          context.fillStyle = 'rgba(255, 100, 100, 1)'
-          context.strokeStyle = 'white'
-          context.lineWidth = 2 + 4 * (1 - t)
-          context.fill()
-          context.stroke()
-
-          // update this image's data with data from the canvas
-          this.data = context.getImageData(0, 0, this.width, this.height).data
-
-          // keep the map repainting
-          map.triggerRepaint()
-
-          // return `true` to let the map know that the image was updated
-          return true
-        }
-      }
-
       
       var id = 'Response';
-
       var link = document.createElement('a');
       link.href = '#';
       link.className = 'active';
-
-      link.onclick = function (e) {
-          console.log("respon 方法")
-      };
 
       var responseLayers = document.getElementById('menu');
       responseLayers.appendChild(link);
       
       //加载图层
       map.on('load', function () {
-        console.log('test')
-        map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 })
-        map.addLayer({
-          id: 'places',
-          type: 'symbol',
-          source: {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  properties: {
-                    description: `<strong>${mydata.datasource[0].name}</strong><p style="text-align:left"><b >Sponsor: </b>${mydata.datasource[0].sponsor}</p><p style="text-align:left"><strong>Responsor: </strong>${mydata.datasource[0].responsor}</strong><p style="text-align:left"><strong >StartTime: </strong>${mydata.datasource[0].startTime}</p><p style="text-align:left"><strong>EndTime: </strong>${mydata.datasource[0].endTime}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
-                    icon: 'monument'
-                  },
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [mydata.datasource[0].lon, mydata.datasource[0].lat]
-                  }
-                },
-                {
-                  type: 'Feature',
-                  properties: {
-                    description: `<strong>${mydata.datasource[1].name}</strong><p style="text-align:left"><b >Sponsor: </b>${mydata.datasource[1].sponsor}</p><p style="text-align:left"><strong>Responsor: </strong>${mydata.datasource[1].responsor}</strong><p style="text-align:left"><strong >StartTime: </strong>${mydata.datasource[1].startTime}</p><p style="text-align:left"><strong>EndTime: </strong>${mydata.datasource[1].endTime}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
-                    icon: 'harbor'
-                  },
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [mydata.datasource[1].lon, mydata.datasource[1].lat]
-                  }
-                },
-                {
-                  type: 'Feature',
-                  properties: {
-                    description:
-                      `<strong>${mydata.datasource[2].name}</strong><p>${mydata.datasource[2].description}</p><a href="http://madmens5finale.eventbrite.com/" target="_blank" title="Opens in a new window">Get more Details</a> `,
-                       icon: 'theatre'
-                  },
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [mydata.datasource[2].lon, mydata.datasource[2].lat]
+           for (let k = 0; k < disastertype.length; k++) {
+          map.loadImage(
+            require("../assets/icon/" + disastertype[k] + ".png"), //获取对应图标
+            (error, image) => {
+              if (error) throw error;
+                map.addImage(disastertype[k], image);
+
+              //获取相应数据
+              axios({
+                url: 'http://116.62.228.138:10003/disasterResponse/disasterGetAll',
+                method: "get",
+              }).then((res) => {
+                var len = res.data.data.length;
+                var dis_data = res.data.data;
+                let feature = []; //灾害点数据
+
+                for (let i = 0; i < len; i++) {
+                  //选择地震类型的数据
+                  if (dis_data[i].dtype == k + 1) {
+                    let geo = []; //单个灾害点位置
+                    let property = []; //单个灾害属性信息
+                    let Coor = new Array(); //单个灾害点位置数据
+                    let des =
+                      "<strong>" +
+                      dis_data[i].name +
+                      "</strong><p>" +
+                      dis_data[i].startTime +
+                      "</p><p>" +
+                      dis_data[i].description +
+                      "</p>"; //单个灾害的描述
+
+                    Coor[0] = dis_data[i].lon;
+                    Coor[1] = dis_data[i].lat;
+
+                    geo.push({
+                      type: "Point",
+                      coordinates: Coor,
+                    });
+
+                    property.push({
+                      description: des,
+                    });
+
+                    feature.push({
+                      type: "Festure",
+                      properties: property[0],
+                      geometry: geo[0],
+                    });
                   }
                 }
-              ]
+
+                let geo = [{ type: "FeatureCollection", features: feature }]; // 所有地震数据
+
+                //将数据转化成json格式
+                let point = JSON.stringify(geo[0]);
+                let point2 = JSON.parse(point);
+
+                //在map中添加图层
+                map.addLayer({
+                  id: disastertype[k],
+                  type: "symbol",
+                  source: {
+                    type: "geojson",
+                    data: point2,
+                  },
+                  layout: {
+                    "icon-image": disastertype[k],
+                    "icon-size": 0.25,
+                  },
+                });
+              });
             }
-          },
-          layout: {
-            'icon-image': '{icon}-15',
-            'icon-allow-overlap': true
-             
-          }
-        })
-        
-        // When a click event occurs on a feature in the places layer, open a popup at the
-        // location of the feature, with description HTML from its properties.
-        map.on('click', 'places', function (e) {
-          var coordinates = e.features[0].geometry.coordinates.slice()
-          var description = e.features[0].properties.description
+          );
+        }
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+      });
 
-          // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
+      // popup, 对于多个灾害图层
+      for (let i = 0; i < disastertype.length; i++) {
+        map.on("mouseenter", disastertype[i], function (e) {
+          map.getCanvas().style.cursor = "pointer";
+
+          var coordinates = e.features[0].geometry.coordinates.slice();
+          var description = e.features[0].properties.description;
+
           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
           }
 
-          new mapboxgl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(description)
-            .addTo(map)
-        })
+          popup.setLngLat(coordinates).setHTML(description).addTo(map);
+        });
 
-        // Change the cursor to a pointer when the mouse is over the places layer.
-        map.on('mouseenter', 'places', function () {
-          map.getCanvas().style.cursor = 'pointer'
-        })
+        map.on("mouseleave", disastertype[i], function () {
+          map.getCanvas().style.cursor = "";
+          popup.remove();
+        });
+      }
+      //   // When a click event occurs on a feature in the places layer, open a popup at the
+      //   // location of the feature, with description HTML from its properties.
+      //   map.on('click', 'places', function (e) {
+      //     var coordinates = e.features[0].geometry.coordinates.slice()
+      //     var description = e.features[0].properties.description
 
-        // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'places', function () {
-          map.getCanvas().style.cursor = ''
-        })
-      })
+      //     // Ensure that if the map is zoomed out such that multiple
+      //     // copies of the feature are visible, the popup appears
+      //     // over the copy being pointed to.
+      //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+      //     }
+
+      //     new mapboxgl.Popup()
+      //       .setLngLat(coordinates)
+      //       .setHTML(description)
+      //       .addTo(map)
+      //   })
+
+      //   // Change the cursor to a pointer when the mouse is over the places layer.
+      //   map.on('mouseenter', 'places', function () {
+      //     map.getCanvas().style.cursor = 'pointer'
+      //   })
+
+      //   // Change it back to a pointer when it leaves.
+      //   map.on('mouseleave', 'places', function () {
+      //     map.getCanvas().style.cursor = ''
+      //   })
+      // })
       let controls = map._controls
       controls.forEach((control) => {
         // 去除logo控件
@@ -268,12 +260,14 @@ export default {
         if ('_attribHTML' in control) {
           map.removeControl(control)
         }
-        console.log(mydata.datasource, 'datasourece2last')
+        
       })
       
-    }
+    },
+      )}
   }
 }
+
 </script>
 
 <style scoped>
@@ -301,5 +295,4 @@ export default {
         font-family: 'Open Sans', sans-serif;
         line-height:50px;
     }
-
 </style>

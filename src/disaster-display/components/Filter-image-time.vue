@@ -23,64 +23,66 @@
 
 
 <script>
-const imgList = [
-  //resolution 1-5分别对应very low,low,medium,high,very high
-  {
-    id: "1",
-    name: "img1",
-    sensor: "Optical",
-    resolution: "Medium",
-    satellite: "LANDSAT",
-    date: "2019-12-29,13:00:54",
-    imgDisplay: false,
-    boundingBox: false,
-    isdisplay: false,
-  },
-  {
-    id: "2",
-    name: "img2",
-    sensor: "Optical",
-    resolution: "Medium",
-    satellite: "GF",
-    date: "2020-01-01,01:00:03",
-    imgDisplay: false,
-    boundingBox: false,
-    isdisplay: false,
-  },
-  {
-    id: "3",
-    name: "img3",
-    sensor: "Radar",
-    resolution: "Low",
-    satellite: "LANDSAT",
-    date: "2020-01-08,17:09:56",
-    imgDisplay: false,
-    boundingBox: false,
-    isdisplay: false,
-  },
-  {
-    id: "4",
-    name: "img4",
-    sensor: "Optical",
-    resolution: "Very Low",
-    satellite: "SENTINEL",
-    date: "2020-01-13,00:08:48",
-    imgDisplay: false,
-    boundingBox: false,
-    isdisplay: false,
-  },
-  {
-    id: "5",
-    name: "img5",
-    sensor: "Radar",
-    resolution: "Very High",
-    satellite: "TENDEM",
-    date: "2020-01-20,12:00:00",
-    imgDisplay: false,
-    boundingBox: false,
-    isdisplay: false,
-  },
-];
+import bus from "./eventBus";
+import axios from "axios";
+// const imgList = [
+//   //resolution 1-5分别对应very low,low,medium,high,very high
+//   {
+//     id: "1",
+//     name: "img1",
+//     sensor: "Optical",
+//     resolution: "Medium",
+//     satellite: "LANDSAT",
+//     date: "2019-12-29,13:00:54",
+//     imgDisplay: false,
+//     boundingBox: false,
+//     isdisplay: false,
+//   },
+//   {
+//     id: "2",
+//     name: "img2",
+//     sensor: "Optical",
+//     resolution: "Medium",
+//     satellite: "GF",
+//     date: "2020-01-01,01:00:03",
+//     imgDisplay: false,
+//     boundingBox: false,
+//     isdisplay: false,
+//   },
+//   {
+//     id: "3",
+//     name: "img3",
+//     sensor: "Radar",
+//     resolution: "Low",
+//     satellite: "LANDSAT",
+//     date: "2020-01-08,17:09:56",
+//     imgDisplay: false,
+//     boundingBox: false,
+//     isdisplay: false,
+//   },
+//   {
+//     id: "4",
+//     name: "img4",
+//     sensor: "Optical",
+//     resolution: "Very Low",
+//     satellite: "SENTINEL",
+//     date: "2020-01-13,00:08:48",
+//     imgDisplay: false,
+//     boundingBox: false,
+//     isdisplay: false,
+//   },
+//   {
+//     id: "5",
+//     name: "img5",
+//     sensor: "Radar",
+//     resolution: "Very High",
+//     satellite: "TENDEM",
+//     date: "2020-01-20,12:00:00",
+//     imgDisplay: false,
+//     boundingBox: false,
+//     isdisplay: false,
+//   },
+// ];
 const timerange = [0, this.disasterlist];
 
 export default {
@@ -88,24 +90,75 @@ export default {
   data() {
     return {
       Timerange2: timerange,
-      imgList: imgList,
-      disastertime: "2020-01-01,08:09:00",
+      imgList: [],
+      disastertime: "2020-01-01 08:09:00",
       disasterlist: 0,
+      
     };
   },
+  mounted() {
+    
+    this.init(1);
+    var self = this;
+    var test;
+    bus.$on("ImageOfDisaster", function (did,date) {
+      
+      self.disastertime=date.toString().substr(0,19);
+      console.log(self.disastertime);
+      
+     // self.init(did);
+
+      
+    });
+    
+    
+    
+  },
   methods: {
+    init(did)
+    {//console.log(did);
+    axios({
+        url: "http://116.62.228.138:10003/images/GetImages", // 获取所有image
+        method: "get",
+      }).then((res) => {
+        var len = res.data.data.length;
+        var img_data = res.data.data;
+
+        img_data = img_data.filter((item) => item.geoJson != null);
+        
+        
+
+        let totalNum = 0;
+        
+        //console.log(this.disasterdate);
+        for (let i = 0; i < len; i++) {
+          if(img_data[i].did==did)
+          {
+            this.imgList.push(img_data[i].date.toString().substr(0,19) // temp_date
+          );
+
+          }
+          
+
+        }
+        this.imgList=this.imgList.sort();
+        console.log(this.imgList);
+      });
+    },
+    
     formatTooltip(val) {
       //获取两个滑块的值
 
       for (let i = 0; i < 2; i++) {
         var choicetime;
         if (this.markInter[i] < this.disasterlist) {
-          choicetime = this.imgList[this.markInter[i]].date;
+          choicetime = this.imgList[this.markInter[i]];
         } else if (this.markInter[i] == this.disasterlist) {
           choicetime = this.disastertime;
         } else {
-          choicetime = this.imgList[this.markInter[i] - 1].date;
+          choicetime = this.imgList[this.markInter[i] - 1];
         }
+        //console.log(choicetime);
         let year = parseInt(choicetime.substr(0, 4));
         let month = parseInt(choicetime.substr(5, 2));
         let date = parseInt(choicetime.substr(8, 2));
@@ -115,16 +168,17 @@ export default {
 
         let time1 = new Date(Date.UTC(year, month - 1, date, hour, min, s));
         this.Timerange2[i] = time1;
+        //console.log(this.Timerange2[i]);
       }
 
-      // console.log(this.Timerange2);
+      //console.log(this.Timerange2);
       this.$emit("filterSelectionTime2", this.Timerange2);
       if (val < this.disasterlist) {
-        return this.imgList[val].date;
+        return this.imgList[val];
       } else if (val == this.disasterlist) {
         return this.disastertime;
       } else {
-        return this.imgList[val - 1].date;
+        return this.imgList[val - 1];
       }
     },
   },
@@ -147,12 +201,12 @@ export default {
         Date.UTC(year, month - 1, date, hour, min, s)
       );
       for (let i = 0; i <= Object.keys(this.imgList).length; i++) {
-        let year1 = parseInt(this.imgList[i].date.substr(0, 4));
-        let month1 = parseInt(this.imgList[i].date.substr(5, 2));
-        let date1 = parseInt(this.imgList[i].date.substr(8, 2));
-        let hour1 = parseInt(this.imgList[i].date.substr(11, 2));
-        let min1 = parseInt(this.imgList[i].date.substr(14, 2));
-        let s1 = parseInt(this.imgList[i].date.substr(17, 2));
+        let year1 = parseInt(this.imgList[i].substr(0, 4));
+        let month1 = parseInt(this.imgList[i].substr(5, 2));
+        let date1 = parseInt(this.imgList[i].substr(8, 2));
+        let hour1 = parseInt(this.imgList[i].substr(11, 2));
+        let min1 = parseInt(this.imgList[i].substr(14, 2));
+        let s1 = parseInt(this.imgList[i].substr(17, 2));
 
         var imgtime = new Date(
           Date.UTC(year1, month1 - 1, date1, hour1, min1, s1)
