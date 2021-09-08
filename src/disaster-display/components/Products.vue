@@ -68,7 +68,9 @@
                   >
                     <img
                       :src="
-                        require('../assets/raster/img' + (index + 1) + '.jpg')
+                        require('../assets/disaster-product-img/product' +
+                          (index + 1) +
+                          '.jpg')
                       "
                       class="image"
                     />
@@ -116,51 +118,7 @@ export default {
       multipleTable: [],
       desOfCarousel: [],
       focusDisaster: 1,
-      tableData: [
-        // {
-        //   id: "1",
-        //   did: "1",
-        //   date: "2016-05-02",
-        //   name: "Product1",
-        //   disaster: "Forest Fire",
-        //   sponsor:
-        //     "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
-        //   producer: "China Group on Earth Observations(GEO)",
-        //   description:
-        //     "Product1 —— Destroyed structures observed nearby the blast epicenter as of July 2021; Widespread damage and damaged roofs observed within a 1 km radius zone from the blast epicenter as of 7 July 2021; No damaged roofs were observed beyond a 2 km radius from the blast epicenter as of 7 & 9 July 2021.",
-        // },
-        // {
-        //   id: "2",
-        //   did: "1",
-        //   date: "2016-07-04",
-        //   name: "Product2",
-        //   disaster: "Flood",
-        //   sponsor:
-        //     "SwissTopo on behalf of Federal Office for Civil Protection FOCP",
-        //   producer: "China Group on Earth Observations(GEO)",
-        //   description: "Product2 ……",
-        // },
-        // {
-        //   id: "3",
-        //   did: "2",
-        //   date: "2016-08-01",
-        //   name: "Product3",
-        //   disaster: "Typhoon",
-        //   sponsor: "UNITAR on behalf of UNOCHA",
-        //   producer: "China Group on Earth Observations(GEO)",
-        //   description: "Product3 ……",
-        // },
-        // {
-        //   id: "4",
-        //   did: "2",
-        //   date: "2016-12-03",
-        //   name: "Product4",
-        //   disaster: "Snow storm",
-        //   sponsor: "UNITAR on behalf of UNOCHA",
-        //   producer: "China Group on Earth Observations(GEO)",
-        //   description: "Product4 ……",
-        // },
-      ],
+      tableData: [], // 读取的所有灾害Product data
       showData: [], // 展示所选灾害的Product data
     };
   },
@@ -193,7 +151,7 @@ export default {
   methods: {
     init() {
       axios({
-        url: "http://localhost:10003/disasterProduct/GetProducts", // 获取所有Product
+        url: "http://localhost:10003/disasterProduct/GetProducts", // 获取所有Product http://116.62.228.138:10003/disasterProduct/GetProducts
         method: "get",
       }).then((res) => {
         var len = res.data.data.length;
@@ -240,7 +198,9 @@ export default {
       for (var i = 0; i < mt.length; i++) {
         var link = document.createElement("a");
         link.download = mt[i].name;
-        link.href = require("../assets/raster/img" + (i + 1) + ".jpg");
+        link.href = require("../assets/disaster-product-img/product" +
+          (i + 1) +
+          ".jpg");
         link.click();
         link.remove();
       }

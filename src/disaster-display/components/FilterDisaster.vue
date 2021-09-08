@@ -208,12 +208,12 @@ export default {
       //var index = id.to
       var loc = this.DisasterList[id - 1].location;
       var title = this.DisasterList[id - 1].name;
-      var date = this.DisasterList[id-1].date;
+      var date = this.DisasterList[id - 1].date;
       bus.$emit("LocToDisaster", loc, did);
       bus.$emit("TitleOfDisaster", title, id);
-      bus.$emit("ImageOfDisaster", did,date);
-      bus.$emit("ImageOfDisaster1", did,date);
-      bus.$emit("ProductOfDisaster", id);
+      bus.$emit("ImageOfDisaster", did, date);
+      bus.$emit("ImageFilterOfDisaster", did, date);
+      bus.$emit("ProductOfDisaster", did);
       this.borderid = id - 1;
     },
 

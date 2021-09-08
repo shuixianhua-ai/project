@@ -43,11 +43,7 @@
         v-show="img.isdisplay"
       >
         <el-card :body-style="{ padding: '5px' }">
-          <img
-            height="90px"
-            :src="require('../assets/raster/img-' + img.mid + '.jpg')"
-            class="image"
-          />
+          <img height="90px" :src="'api/preview?id=' + img.mid" class="image" />
           <div class="infodisplay" style="padding: 10px">
             <el-collapse v-model="activeNames" @change="handleChange">
               <el-collapse-item class="subcollapse">
@@ -91,7 +87,7 @@
               type="info"
               icon="el-icon-download"
               circle
-              @click="downloadClick(img.name, img.mid)"
+              @click="downloadClick(img.isdownload, img.mid)"
               plain
             ></el-button>
             <el-button
@@ -117,6 +113,15 @@
         (Default - Activation 1)</el-tabs
       >
     </el-dialog>
+
+    <el-dialog :visible.sync="dialogVisible2" width="22.5%">
+      <div style="margin: 5px 0"></div>
+      <el-tabs type="border-card">
+        <strong>NOTICE</strong><br /><br />
+        This image has <strong>not been downloaded </strong>to the server yet.
+        <br />Now begins to download...
+      </el-tabs>
+    </el-dialog>
   </div>
 </template>
 
@@ -137,8 +142,9 @@ export default {
       selectionContent3: [], //satellite
       selectionTime: [], //time
       focusDisaster: 0, //当前页面关注的灾害id
-      disasterdate:"2020-01-01 01:00:03",
+      disasterdate: "2020-01-01 01:00:03",
       dialogVisible: false,
+      dialogVisible2: false,
       imgList: [
         //resolution 1-5分别对应very low,low,medium,high,very high
         // {
@@ -185,21 +191,16 @@ export default {
     };
   },
   mounted() {
-    
     this.init();
     var self = this;
-    bus.$on("ImageOfDisaster", function (did,date) {
+    bus.$on("ImageOfDisaster", function (did, date) {
       self.focusDisaster = did;
-      self.disasterdate=date;
-      //console.log(self.focusDisaster);
+      self.disasterdate = date;
     });
-    
-    
   },
   methods: {
     // 对 imgList 添加影像列表
     init() {
-      
       axios({
         url: "http://116.62.228.138:10003/images/GetImages", // 获取所有image
         method: "get",
@@ -210,9 +211,9 @@ export default {
         img_data = img_data.filter((item) => item.geoJson != null);
 
         let totalNum = 0;
-        
-        //console.log(this.disasterdate);
+
         for (let i = 0; i < len; i++) {
+          // <len
           // 对数据库内属性进行转换
 
           // 分辨率
@@ -261,17 +262,15 @@ export default {
             sensor: temp_sensor,
             satellite: temp_satellite,
             resolution: temp_resolution,
-            date: img_data[i].date.toString().substr(0,19), // temp_date
+            date: img_data[i].date.toString().substr(0, 19), // temp_date
             boxgeo: geo,
             imgDisplay: false,
             boundingBox: false, // true
-            //isdownload: img_data[i].downloadState,
+            isdownload: img_data[i].downloadState,
             isdisplay: false,
           });
         }
         //this.imgList.sort(compare("id")); //  按id排序
-
-        //过滤得到disaster_id为当前灾害的遥感影像
       });
     },
     sendImgFlag(id) {
@@ -291,16 +290,23 @@ export default {
     handleChange(val) {
       console.log(val);
     },
-    downloadClick(name, mid) {
-      //img下载
+
+    //img下载
+    downloadClick(downloadState, mid) {
+      //mid = "54d5ed36-b564-44be-bc75-9b65f3b2938d";
       var link = document.createElement("a");
-      //link.download = name;
-      link.href =
-        "http://116.62.228.138:10003/file/downloadfile?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
-      //link.href = "http://116.62.228.138:10003/file/downloadfile?" + mid;
-      link.click();
-      link.remove();
+      link.download = "image";
+      if (downloadState == "not downloaded") {
+        link.href = "http://116.62.228.138:10003/download?id=" + mid;
+        window.open(link.href, "_blank");
+        this.dialogVisible2 = true;
+      } else {
+        link.href = "http://116.62.228.138:10003/file/downloadfile?id=" + mid;
+        link.click();
+        link.remove();
+      }
     },
+
     getSelection1(selection) {
       this.selectionContent1 = selection;
     },
@@ -325,6 +331,7 @@ export default {
     queryInfoClick() {
       if (this.focusDisaster == 0) {
         this.dialogVisible = true;
+        this.focusDisaster = 1;
       }
 
       for (var i = 0; i < this.imgList.length; i++) {

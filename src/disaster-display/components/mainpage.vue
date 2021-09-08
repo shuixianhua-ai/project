@@ -3,9 +3,7 @@
     <selectFrame class="frame" />
   </div>
 </template>
-<!--script src='turf.min.js'></script>-->
 <script>
-//也可以全局引入 但是建议map对象还是少做传值，可以通过组件通信，统一在此处操作
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -147,12 +145,41 @@ export default {
 
         tempUrl = "api/preview?id=" + imgRoute; //"http://116.62.228.138:10003/preview?id=54d5ed36-b564-44be-bc75-9b65f3b2938d";
 
-        if (imageList[i].did > 0) {
+        if (imageList[i].did == 6) {
           boxcoord = [
             [7.66286529, 47.845914827],
             [9.130470362, 47.853627712],
             [9.128057161, 46.865628248],
             [7.6875885, 46.858175958],
+          ];
+        } else if (imageList[i].did == 2) {
+          boxcoord = [
+            [101.794084839598, 15.3596134707623],
+            [102.788492891379, 15.3448615701267],
+            [102.788492891379, 14.3573155020071],
+            [101.781350251076, 14.3573155020071],
+          ];
+        } else if (imageList[i].did == 4) {
+          boxcoord = [
+            [-18.812958, 65.8059306952756],
+            [-16.418518, 65.7528861633442],
+            [-16.585999, 64.7707413515814],
+            [-18.893158, 64.8214507749945],
+          ];
+        } else if (imageList[i].did == 5) {
+          boxcoord = [
+            [83.9496629151503, 27.9915778316894],
+            [85.065342492413, 28.0118164219147],
+            [85.0826066464353, 27.0211122585013],
+            [83.9768526405984, 27.0017062170866],
+          ];
+        } else {
+          //
+          boxcoord = [
+            [102.554147977806, 14.3573155020071],
+            [102.554147977806, 15.3448615701267],
+            [101.794084839598, 15.3596134707623],
+            [101.781350251076, 14.3573155020071],
           ];
         }
 
@@ -246,41 +273,6 @@ export default {
       self.map.flyTo({
         center: loc,
       });
-
-      // var disBoxList = self.boxResData.filter((item) => item.did === did); // 该灾害下的影像框  --  影像框图层只要保持一致即可
-      // let length = disBoxList.length;
-
-      // for (let i = 0; i < length; i++) {
-      //   var geoText = JSON.stringify(disBoxList[i].geoJson);
-      //   var geoText2 = JSON.parse(geoText);
-      //   var geoJson = eval("(" + geoText2 + ")");
-      //   var geo = geoJson.coordinates[0]; // coordinates
-
-      //   self.map.addLayer({
-      //     id: "boundingbox_dis" + did + "_layer_" + i, // 图层id
-      //     type: "line",
-      //     source: {
-      //       type: "geojson",
-      //       data: {
-      //         type: "FeatureCollection",
-      //         features: [
-      //           {
-      //             type: "Feature",
-      //             geometry: {
-      //               type: "Polygon",
-      //               coordinates: geo,
-      //             },
-      //           },
-      //         ],
-      //       },
-      //     },
-      //     layout: {},
-      //     paint: {
-      //       "line-color": "#088",
-      //       "line-width": 1.0,
-      //     },
-      //   });
-      // }
     });
   },
   methods: {
@@ -313,39 +305,6 @@ export default {
       }).then((res) => {
         var length = res.data.data.length; // 从数据库共返回了几条记录
         that.boxResData = res.data.data;
-
-        // for (let i = 0; i < length; i++) {
-        //   var geoText = JSON.stringify(res.data.data[i].geoJson);
-        //   var geoText2 = JSON.parse(geoText);
-        //   var geoJson = eval("(" + geoText2 + ")");
-        //   var geo = geoJson.coordinates[0]; // coordinates
-        //   //console.log(geo); // 第一个包围盒
-
-        //   that.map.addLayer({
-        //     id: "boundingbox" + i,
-        //     type: "line",
-        //     source: {
-        //       type: "geojson",
-        //       data: {
-        //         type: "FeatureCollection",
-        //         features: [
-        //           {
-        //             type: "Feature",
-        //             geometry: {
-        //               type: "Polygon",
-        //               coordinates: geo,
-        //             },
-        //           },
-        //         ],
-        //       },
-        //     },
-        //     layout: {},
-        //     paint: {
-        //       "line-color": "#088",
-        //       "line-width": 1.0,
-        //     },
-        //   });
-        // }
       });
 
       that.map.on("load", function () {
@@ -618,24 +577,22 @@ export default {
       }
     },
     updateArea(e) {
-      //debugger;
-      // // 添加图层
-      // this.map.addLayer({
-      //   id: "maine",
-      //   type: "fill",
-      //   source: {
-      //     type: "geojson",
-      //     data: e.features[0],
-      //   },
-      //   paint: {
-      //     "fill-color": "#4682B4",
-      //     "fill-opacity": 0.5,
-      //     "fill-outline-color": "#0e2944",
-      //   },
-      // });
-      //this.draw.delete(e.features[0].id);   // 删除所绘制feature
-
-      // console.log(this.draw.getAll());
+      debugger;
+      // 添加图层
+      this.map.addLayer({
+        id: "maine",
+        type: "fill",
+        source: {
+          type: "geojson",
+          data: e.features[0],
+        },
+        paint: {
+          "fill-color": "#4682B4",
+          "fill-opacity": 0.5,
+          "fill-outline-color": "#0e2944",
+        },
+      });
+      this.draw.delete(e.features[0].id); // 删除所绘制feature
 
       var aoi = this.draw.getAll();
       if (aoi.features.length > 0) {

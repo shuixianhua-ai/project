@@ -192,7 +192,7 @@ export default {
   mounted () {
     this.$axios({
       method: 'post',
-      url: 'http://116.62.228.138:10001/disaster'
+      url: 'http://116.62.228.138:10003/disaster'
     }).then(res => {
       console.log(res.data)
       this.option = res.data

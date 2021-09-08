@@ -25,99 +25,49 @@
 <script>
 import bus from "./eventBus";
 import axios from "axios";
-// const imgList = [
-//   //resolution 1-5分别对应very low,low,medium,high,very high
-//   {
-//     id: "1",
-//     name: "img1",
-//     sensor: "Optical",
-//     resolution: "Medium",
-//     satellite: "LANDSAT",
-//     date: "2019-12-29,13:00:54",
-//     imgDisplay: false,
-//     boundingBox: false,
-//     isdisplay: false,
-//   },
-//   {
-//     id: "2",
-//     name: "img2",
-//     sensor: "Optical",
-//     resolution: "Medium",
-//     satellite: "GF",
-//     date: "2020-01-01,01:00:03",
-//     imgDisplay: false,
-//     boundingBox: false,
-//     isdisplay: false,
-//   },
-//   {
-//     id: "3",
-//     name: "img3",
-//     sensor: "Radar",
-//     resolution: "Low",
-//     satellite: "LANDSAT",
-//     date: "2020-01-08,17:09:56",
-//     imgDisplay: false,
-//     boundingBox: false,
-//     isdisplay: false,
-//   },
-//   {
-//     id: "4",
-//     name: "img4",
-//     sensor: "Optical",
-//     resolution: "Very Low",
-//     satellite: "SENTINEL",
-//     date: "2020-01-13,00:08:48",
-//     imgDisplay: false,
-//     boundingBox: false,
-//     isdisplay: false,
-//   },
-//   {
-//     id: "5",
-//     name: "img5",
-//     sensor: "Radar",
-//     resolution: "Very High",
-//     satellite: "TENDEM",
-//     date: "2020-01-20,12:00:00",
-//     imgDisplay: false,
-//     boundingBox: false,
-//     isdisplay: false,
-//   },
-// ];
+
 const timerange = [0, this.disasterlist];
 
 export default {
   name: "filterTime2",
   data() {
     return {
-      Timerange2: timerange,
-      imgList: [],
-      disastertime: "2020-01-01 08:09:00",
-      disasterlist: 0,
-      
+      Timerange2: timerange,//获取滑块两端数值，用于过滤
+      imgList: [],//对应事件的图像时间数组
+      timeList:[],//所有图像集合
+      disastertime: "2020-01-01 08:09:00",//对应灾害时间
+      disasterlist: 0,//滑块长度【对应灾害图像数】
     };
   },
   mounted() {
-    
-    this.init(1);
-    var self = this;
-    var test;
-    bus.$on("ImageOfDisaster", function (did,date) {
-      
-      self.disastertime=date.toString().substr(0,19);
-      console.log(self.disastertime);
-      
-     // self.init(did);
+    //获取所有图像的时间
+    this.init();
 
+    var self = this;
+    //console.log(self.timeList);
+    //获取选择的事件的id
+    bus.$on("ImageFilterOfDisaster", function (did, date) {
+      self.disastertime = date.toString().substr(0, 19);
+      //self.imgList=[];
+      //console.log(self.disastertime);
+
+      //筛选出所选事件对应的图像
+      for (let i = 0; i < Object.keys(self.timeList).length; i++) {
+        if (self.timeList[i].did == did) {
+          self.imgList.push(self.timeList[i].date);
+          //console.log(self.timeList[i].date);
+        }
+      }
       
+      self.imgList = self.imgList.sort();
+      //console.log(self.imgList);
+      // this.init(did);
     });
-    
-    
-    
   },
   methods: {
-    init(did)
-    {//console.log(did);
-    axios({
+    //初始化，获取所有图像对应事件id以及图像时间
+    init() {
+      axios({
         url: "http://116.62.228.138:10003/images/GetImages", // 获取所有image
         method: "get",
       }).then((res) => {
@@ -125,30 +75,29 @@ export default {
         var img_data = res.data.data;
 
         img_data = img_data.filter((item) => item.geoJson != null);
-        
-        
 
-        let totalNum = 0;
-        
-        //console.log(this.disasterdate);
+  
+        //获取所有图像对应事件id以及图像时间
         for (let i = 0; i < len; i++) {
-          if(img_data[i].did==did)
-          {
-            this.imgList.push(img_data[i].date.toString().substr(0,19) // temp_date
-          );
+         
+            this.timeList.push({
+              did:img_data[i].did,
+              date:img_data[i].date.toString().substr(0, 19),
 
-          }
+            }
+               
+            );
           
-
         }
-        this.imgList=this.imgList.sort();
-        console.log(this.imgList);
+        
+        //console.log(this.imgList);
       });
     },
-    
-    formatTooltip(val) {
-      //获取两个滑块的值
 
+    //滑块滑动后响应
+    formatTooltip(val) {
+      
+      //从滑块相对数值转化成对应的时间值，并显示在上方标签上
       for (let i = 0; i < 2; i++) {
         var choicetime;
         if (this.markInter[i] < this.disasterlist) {
@@ -172,6 +121,7 @@ export default {
       }
 
       //console.log(this.Timerange2);
+      //将两个滑块对应的时间值传到图像过滤处，方便过滤
       this.$emit("filterSelectionTime2", this.Timerange2);
       if (val < this.disasterlist) {
         return this.imgList[val];
@@ -183,13 +133,20 @@ export default {
     },
   },
   computed: {
+    ///设置时间滑动条样式
+
+    //设置时间滑动条长度
     getLength: function () {
       //console.log(Object.keys(this.imgList).length);
       // return Object.keys(this.imgList).length;
       return Object.keys(this.imgList).length.toString();
     },
+
+    //设置时间滑动条下方标签
     getMarks: function () {
+
       let marks = {};
+      //转化灾害时间格式
       let year = parseInt(this.disastertime.substr(0, 4));
       let month = parseInt(this.disastertime.substr(5, 2));
       let date = parseInt(this.disastertime.substr(8, 2));
@@ -200,6 +157,8 @@ export default {
       var disastertime = new Date(
         Date.UTC(year, month - 1, date, hour, min, s)
       );
+
+      //转化图像时间格式
       for (let i = 0; i <= Object.keys(this.imgList).length; i++) {
         let year1 = parseInt(this.imgList[i].substr(0, 4));
         let month1 = parseInt(this.imgList[i].substr(5, 2));
@@ -211,19 +170,55 @@ export default {
         var imgtime = new Date(
           Date.UTC(year1, month1 - 1, date1, hour1, min1, s1)
         );
+
+        //确定灾害时间和图片时间的相对位置
         if (disastertime <= imgtime) {
           this.disasterlist = i;
           break;
         }
       }
+
+      //生成滑动条下方标签
       for (let i = 0; i <= Object.keys(this.imgList).length; i++) {
+        
+        //开头标签
         if (i == 0) {
-          marks[i] = "before";
-        } else if (i == this.disasterlist) {
+          //所有图像时间都在灾害后
+          if(this.disasterlist==0)
+          {
+            marks[i] = "disaster";
+          }
+          //表示灾害前图像
+          else
+          {
+            marks[i] = "before";
+          } 
+        } 
+
+        //灾害点标签
+        else if (i == this.disasterlist) 
+        {
+          //表示灾害位置
           marks[i] = "disaster";
-        } else if (i == Object.keys(this.imgList).length) {
-          marks[i] = "after";
-        } else {
+        } 
+
+        //末尾标签
+        else if (i == Object.keys(this.imgList).length) 
+        {
+          //所有图像时间都在灾害后
+          if(this.disasterlist==i)
+          {
+            marks[i] = "disaster";
+          }
+          //表示灾害后图像
+          else
+          {
+            marks[i] = "after";
+          }
+          
+        }
+        //非特殊点用“*”表示
+         else {
           marks[i] = {
             style: {
               color: "#ccc",
