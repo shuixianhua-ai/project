@@ -129,12 +129,8 @@ export default {
                 map.addImage(disastertype[k], image);
 
               //获取相应数据
-              axios({
-                url: 'http://116.62.228.138:10003/disasterResponse/disasterGetAll',
-                method: "get",
-              }).then((res) => {
-                var len = res.data.data.length;
-                var dis_data = res.data.data;
+                var len = mydata.datasource.length;
+                var dis_data = mydata.datasource;
                 let feature = []; //灾害点数据
 
                 for (let i = 0; i < len; i++) {
@@ -191,7 +187,6 @@ export default {
                     "icon-size": 0.25,
                   },
                 });
-              });
             }
           );
         }

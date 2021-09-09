@@ -60,12 +60,6 @@
         </el-col>
       </el-row>
     </div>
-    <!-- test code -->
-    <!-- <div>
-      <p style="color:red;">Num：{{ myIndex }}</p>
-    <p>{{ msg }}</p>
-    </div> -->
-    <!-- test code -->
 
     <el-dialog :visible.sync="dialogVisible" width="55%">
       <div style="margin: 15px 0"></div>
@@ -138,7 +132,7 @@ export default {
       CollapseActiveNames: [],
       selectionContent: [],
       selectionTime: [],
-      Selectedid: 0,
+      Selectedid: 0,//被选中的事件对应的id
       dialogVisible: false,
       borderid: -1,
       DisasterList: [],
@@ -204,16 +198,16 @@ export default {
       this.Selectedid = id - 1;
     },
 
+    /* 选择灾害 */
     sendLocFlag(id, did) {
-      //var index = id.to
       var loc = this.DisasterList[id - 1].location;
       var title = this.DisasterList[id - 1].name;
       var date = this.DisasterList[id - 1].date;
-      bus.$emit("LocToDisaster", loc, did);
-      bus.$emit("TitleOfDisaster", title, id);
-      bus.$emit("ImageOfDisaster", did, date);
-      bus.$emit("ImageFilterOfDisaster", did, date);
-      bus.$emit("ProductOfDisaster", did);
+      bus.$emit("LocToDisaster", loc, did); // 地图以灾害地点为中心
+      bus.$emit("TitleOfDisaster", title, id); // 地图左上角浮动框显示灾害名称
+      bus.$emit("ImageOfDisaster", did, date); // 传递灾害did值，作为遥感影像过滤条件
+      bus.$emit("ImageFilterOfDisaster", did, date); // 传递灾害did和data，更新影像过滤的时间条
+      bus.$emit("ProductOfDisaster", did); // 传递灾害did值，作为灾害响应产品的过滤条件
       this.borderid = id - 1;
     },
 
@@ -222,15 +216,13 @@ export default {
       //目前仅针对satellite的filter
       this.selectionContent = selection;
     },
+    //获取选中的时间范围
     getSelectionTime(selection) {
       this.selectionTime = selection;
     },
     queryType() {
       //按勾选的灾害类型过滤
       for (let i = 0; i < this.DisasterList.length; i++) {
-        // if (this.selectionContent.length == 0) {
-        //   this.DisasterList[i].isdisplay_type = false;
-        // }
         for (let j = 0; j < this.selectionContent.length; j++) {
           if (this.DisasterList[i].type == this.selectionContent[j].name) {
             this.DisasterList[i].isdisplay_type = true;
@@ -241,10 +233,12 @@ export default {
 
       //按勾选的时间过滤
       for (let i = 0; i < this.DisasterList.length; i++) {
+        
+        //将灾害的时间转化，方便和滑块时间范围比较
         var year = this.DisasterList[i].date.substr(0, 4);
         var month = this.DisasterList[i].date.substr(5, 2);
         var datanumber = (parseInt(year) - 2000) * 12 + parseInt(month);
-        console.log(this.selectionTime);
+        //console.log(this.selectionTime);
 
         if (
           datanumber <=

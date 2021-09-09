@@ -1,7 +1,6 @@
 <template>
   <div id="baseLayout">
     <el-container>
-      <!-- <el-header>Header</el-header> -->
       <el-header style="padding: 0 20px">
         <headOfPage> </headOfPage>
       </el-header>
@@ -17,6 +16,7 @@
               name="Activation"
               :style="{ height: tagcontentheight }"
             >
+              <!-- 1.“灾害”过滤与显示模块 -->
               <filterOfDisaster />
             </el-tab-pane>
             <!-- 动态设置组件高度，使得能够填充页面 -->
@@ -25,6 +25,7 @@
               name="Acquisitions"
               :style="{ height: tagcontentheight }"
             >
+              <!-- 2.“遥感影像”过滤与显示模块 -->
               <filterOfPictures />
             </el-tab-pane>
             <el-tab-pane
@@ -32,9 +33,9 @@
               name="Products"
               :style="{ height: tagcontentheight }"
             >
+              <!-- 3.“灾害响应产品”模块 -->
               <productofPage />
             </el-tab-pane>
-            <!-- <el-tab-pane label="功能4">功能4</el-tab-pane> -->
           </el-tabs>
         </el-aside>
         <el-container>
@@ -54,7 +55,6 @@ import mainmap from "./mainpage";
 import filterOfPictures from "./FilterImage";
 import filterOfDisaster from "./FilterDisaster.vue";
 import productofPage from "./Products";
-import axios from "axios";
 
 export default {
   name: "baseLayout",
@@ -62,15 +62,10 @@ export default {
     return {
       activeName1: "Activation",
       tagcontentheight: "", //作为传递动态获取浏览器页面高度的参数
-      msg: "",
-      myIndex: "",
     };
   },
   mounted() {
     this.init();
-
-    this.msg = this.$route.params.msgKeyOne;
-    this.myIndex = this.$route.query.id;
   },
   methods: {
     init() {
@@ -78,15 +73,13 @@ export default {
       this.tagcontentheight =
         `${document.documentElement.clientHeight}` - 140 + "px";
     },
-    handleClick(tab, event) {
-      //console.log(tab, event);
-    },
+    handleClick(tab, event) {},
   },
   components: {
-    mainmap: mainmap,
-    filterOfPictures: filterOfPictures,
-    filterOfDisaster: filterOfDisaster,
-    productofPage: productofPage,
+    mainmap: mainmap, // 主地图组件
+    filterOfPictures: filterOfPictures, // 影像过滤组件
+    filterOfDisaster: filterOfDisaster, // 灾害过滤组件
+    productofPage: productofPage, // 灾害响应产品组件
   },
 };
 </script>

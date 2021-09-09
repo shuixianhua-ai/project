@@ -145,20 +145,7 @@ export default {
       disasterdate: "2020-01-01 01:00:03",
       dialogVisible: false,
       dialogVisible2: false,
-      imgList: [
-        //resolution 1-5分别对应very low,low,medium,high,very high
-        // {
-        //   id: 0,
-        //   name: "img1",
-        //   sensor: "Optical",
-        //   resolution: "Medium",
-        //   satellite: "LANDSAT7",
-        //   date: "2019-12-29,13:00:54",
-        //   imgDisplay: false,
-        //   boundingBox: false,
-        //   isdisplay: false,
-        // }
-      ],
+      imgList: [],
       SensorOptions: ["Optical", "Radar"],
       ResolutionOptions: ["Very High", "High", "Medium", "Low", "Very Low"],
       SatelliteOptions: [
@@ -199,7 +186,7 @@ export default {
     });
   },
   methods: {
-    // 对 imgList 添加影像列表
+    /* 对 imgList 添加影像列表 */
     init() {
       axios({
         url: "http://116.62.228.138:10003/images/GetImages", // 获取所有image
@@ -209,11 +196,9 @@ export default {
         var img_data = res.data.data;
 
         img_data = img_data.filter((item) => item.geoJson != null);
-
         let totalNum = 0;
 
         for (let i = 0; i < len; i++) {
-          // <len
           // 对数据库内属性进行转换
 
           // 分辨率
@@ -245,13 +230,13 @@ export default {
 
           // 时间
           let temp_date;
-          temp_date = img_data[i].date.substring(0, 19);
+          temp_date = img_data[i].date.toString().substr(0, 19);
 
           // 包围盒
           let geoText = JSON.stringify(img_data[i].geoJson);
           let geoText2 = JSON.parse(geoText);
           let geoJson = eval("(" + geoText2 + ")");
-          let geo = geoJson.coordinates[0]; // coordinates
+          let geo = geoJson.coordinates[0];
 
           // 将数据库内的影像添加至imgList
           this.imgList.push({
@@ -262,49 +247,52 @@ export default {
             sensor: temp_sensor,
             satellite: temp_satellite,
             resolution: temp_resolution,
-            date: img_data[i].date.toString().substr(0, 19), // temp_date
-            boxgeo: geo,
-            imgDisplay: false,
-            boundingBox: false, // true
-            isdownload: img_data[i].downloadState,
-            isdisplay: false,
+            date: temp_date,
+            boxgeo: geo, // 包围盒
+            imgDisplay: false, // 是否在地图上显示影像
+            boundingBox: false, // 是否在地图上显示包围盒
+            isdownload: img_data[i].downloadState, // 是否已下载至服务器
+            isdisplay: false, //是否在过滤查询后显示
           });
         }
         //this.imgList.sort(compare("id")); //  按id排序
       });
     },
     sendImgFlag(id) {
-      // 切换地图上相应img的可见性
+      /* 切换地图上相应img的可见性 */
       this.imgList[id - 1].imgDisplay = !this.imgList[id - 1].imgDisplay;
       bus.$emit("MainpageImg", id, this.imgList);
     },
     sendBoxFlag(id) {
-      // 切换地图上相应影像包围盒的可见性
+      /* 切换地图上相应影像包围盒的可见性 */
       this.imgList[id - 1].boundingBox = !this.imgList[id - 1].boundingBox;
       bus.$emit("MainpageBox", this.imgList);
     },
     sendLocFlag(id) {
+      /* 地图以所选影像为中心*/
       let boxgeo = this.imgList[id - 1].boxgeo;
       bus.$emit("MainpageLoc", boxgeo, id);
     },
-    handleChange(val) {
-      console.log(val);
-    },
+    handleChange(val) {},
 
-    //img下载
     downloadClick(downloadState, mid) {
-      //mid = "54d5ed36-b564-44be-bc75-9b65f3b2938d";
+      /* 下载所选影像 */
       var link = document.createElement("a");
       link.download = "image";
+
+      // 影像未下载至服务器时 - 请求将该影像下载至服务器
       if (downloadState == "not downloaded") {
         link.href = "http://116.62.228.138:10003/download?id=" + mid;
         window.open(link.href, "_blank");
-        this.dialogVisible2 = true;
-      } else {
+        this.dialogVisible2 = true; // 跳出弹窗提示
+      }
+      // 影像已下载至服务器时 - 将影像下载至本地
+      else {
         link.href = "http://116.62.228.138:10003/file/downloadfile?id=" + mid;
         link.click();
         link.remove();
       }
+      //mid = "54d5ed36-b564-44be-bc75-9b65f3b2938d";
     },
 
     getSelection1(selection) {
@@ -317,6 +305,7 @@ export default {
       //目前仅针对satellite的filter
       this.selectionContent3 = selection;
     },
+    //获取时间过滤中滑动条的范围
     getSelectionTime2(selection) {
       this.selectionTime2 = selection;
       //console.log(this.selectionTime2);
@@ -335,11 +324,13 @@ export default {
       }
 
       for (var i = 0; i < this.imgList.length; i++) {
-        var f1 = 0; // 过滤传感器类型为所选条件
-        var f2 = 0; // 过滤分辨率为所选条件
-        var f3 = 0; // 过滤卫星类型为所选条件
-        var f4 = 0; // 过滤拍摄时间为所选时间区间
-        var f5 = 0; // 过滤当前所选灾害的相关影像
+        var f1 = 0;
+        var f2 = 0;
+        var f3 = 0;
+        var f4 = 0;
+        var f5 = 0;
+
+        // 过滤传感器类型为所选条件
         if (this.selectionContent1.length > 0) {
           for (var j = 0; j < this.selectionContent1.length; j++) {
             if (this.imgList[i].sensor == this.selectionContent1[j]) {
@@ -348,6 +339,8 @@ export default {
             }
           }
         } else f1 = 1;
+
+        // 过滤分辨率为所选条件
         if (this.selectionContent2.length > 0) {
           for (var j = 0; j < this.selectionContent2.length; j++) {
             if (this.imgList[i].resolution == this.selectionContent2[j]) {
@@ -356,8 +349,9 @@ export default {
             }
           }
         } else f2 = 1;
+
+        // 过滤卫星类型为所选条件
         if (this.selectionContent3.length > 0) {
-          //console.log(this.selectionContent3.length);
           for (var j = 0; j < this.selectionContent3.length; j++) {
             if (this.imgList[i].satellite == this.selectionContent3[j]) {
               f3 = 1;
@@ -366,7 +360,7 @@ export default {
           }
         } else f3 = 1;
 
-        //按时间过滤
+        // 过滤拍摄时间为所选时间区间
         if (this.selectionTime2.length > 0) {
           var year = this.imgList[i].date.substr(0, 4);
           var month = this.imgList[i].date.substr(5, 2);
@@ -377,8 +371,6 @@ export default {
           var datanumber = new Date(
             Date.UTC(year, month - 1, date, hour, min, s)
           );
-          //console.log(min);
-          console.log(this.selectionTime2);
 
           if (
             datanumber <=
@@ -388,9 +380,10 @@ export default {
           ) {
             f4 = 1;
           }
-        } else f4 = 1;
+        } 
+        else f4 = 1;
 
-        // 按是否为当前所选的灾害id过滤
+        // 过滤当前所选灾害的相关影像
         if (this.imgList[i].did == this.focusDisaster) {
           f5 = 1;
         }
@@ -404,7 +397,6 @@ export default {
   components: {
     filterModel: filterModel,
     filterTime2: filterTime2,
-    // FilterModel,
   },
 };
 </script>

@@ -1,0 +1,1 @@
+console.log(Math.cos(180/90*3.1416));

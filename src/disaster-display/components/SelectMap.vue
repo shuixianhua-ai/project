@@ -3,14 +3,14 @@
     <div class="map-overlay top" position="top-right">
       <div class="map-overlay-inner">
         <fieldset>
+          <!-- 显示当前所选的“灾害”名称 -->
           <label class="title">{{ msg }}</label>
-          <!-- <el-divider></el-divider> -->
           <label>Select Data to Download</label>
           <select id="layer" name="layer">
             <option value="dem">DEM Data</option>
             <option value="population">Population Data</option>
             <option value="osm">OSM Street Data</option>
-            <option value="lulc">Land Cover Data</option>
+            <option value="landcover">Land Cover Data</option>
           </select>
         </fieldset>
         <fieldset>
@@ -79,15 +79,17 @@
 <script>
 import bus from "./eventBus";
 
+/* “基础数据”的属性信息 */
 const dataList = [
   {
-    name: "DEM",
-    type: "basic geographic data",
-    spatial_resolution: "30m",
-    source:
+    name: "DEM", // 基础数据名称
+    type: "basic geographic data", // 数据类型
+    spatial_resolution: "30m", // 数据空间分辨率
+    source: // 数据源
       "JAXA: ALOS WORLD 30(https://www.eorc.jaxa.jp/ALOS/en/aw3d30/index.htm)",
-    description:
+    description: // 描述
       "This data set is a global digital surface model (DSM) with horizontal resolution of approximately 30 meters (basically 1 arcsecond) by the Panchromatic Remote-sensing Instrument for Stereo Mapping (PRISM), which was an optical sensor on board the Advanced Land Observing Satellite 'ALOS'. The latest version is 3.1 (southern area from 60 degrees south is ver. 1.0, and ver. 3.1 is coming soon). Any of the commercial and non-commercial purposes can be used free of charge under the conditions of the '5. Terms of Use' below. We hope that this dataset will be widely used in scientific research, education, and new services that use geospatial information.",
+    
   },
   {
     name: "population data",
@@ -121,18 +123,20 @@ export default {
   data() {
     return {
       msg: "",
-      checkeddataid: 0,
+      checkeddataid: 0, // 勾选的数据类型id
       dialogVisible: false,
       dataList: dataList,
     };
   },
   mounted() {
     var self = this;
+    /* 更新的灾害标题 */
     bus.$on("TitleOfDisaster", function (title, id) {
       self.msg = title;
     });
   },
   methods: {
+    /* 切换下拉框选择的数据类型 */
     showdatainfo() {
       var item = document.getElementById("layer").value;
       if (item == "dem") {
@@ -146,12 +150,13 @@ export default {
       }
       this.dialogVisible = true;
     },
+
+    /* 基础数据下载 */
     downloadData() {
       var item = document.getElementById("layer").value;
       var link = document.createElement("a");
       link.download = item + ".rar";
-      //link.href = require("../assets/disaster-img/img1.png");
-      link.href = "/static/Disaster-download/DEM.rar";
+      link.href = "/static/Disaster-download/" + item + ".rar";
       link.click();
       link.remove();
     },

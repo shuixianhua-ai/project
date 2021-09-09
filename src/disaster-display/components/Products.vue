@@ -122,9 +122,7 @@ export default {
       showData: [], // 展示所选灾害的Product data
     };
   },
-  created() {
-    console.log(this.desOfCarousel.length);
-  },
+  created() {},
   watch: {
     multipleTable(o, n) {
       if (o.length > 0) this.desOfCarousel = o[0].description;
@@ -150,14 +148,15 @@ export default {
   },
   methods: {
     init() {
+      /* 获取灾害响应产品数据 */
       axios({
-        url: "http://localhost:10003/disasterProduct/GetProducts", // 获取所有Product http://116.62.228.138:10003/disasterProduct/GetProducts
+        url: "http://116.62.228.138:10003/disasterProduct/GetProducts",
         method: "get",
       }).then((res) => {
         var len = res.data.data.length;
         var product_data = res.data.data;
         let totalNum = 0;
-        product_data = product_data.filter((item) => item.description != null);
+        product_data = product_data.filter((item) => item.description != null); // 过滤description不为空的数据
         for (let i = 0; i < len; i++) {
           let id = product_data[i].id;
           this.tableData.push({
@@ -172,12 +171,10 @@ export default {
           });
         }
 
-        this.showData = this.tableData;
+        this.showData = this.tableData; // 模块初始展示所有获取的灾害响应数据
       });
     },
-    handleClick(tab, event) {
-      // console.log(tab, event);
-    },
+    handleClick(tab, event) {},
     handleClose(done) {
       this.$confirm("Sure close?")
         .then((_) => {
@@ -187,11 +184,9 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleTable = val;
-      // console.log(this.multipleTable);
     },
     getChange(pre, next) {
       this.desOfCarousel = this.multipleTable[pre].description;
-      // console.log(pre+ "  " +next);
       console.log(this.desOfCarousel);
     },
     downloadClick(mt) {

@@ -31,6 +31,7 @@
 </template>
 
 <script>
+//设置灾害种类与图标
 const TypeOptions = [
   { imgSrc: require("../assets/icon/earthquake.png"), name: "Earthquake" },
   { imgSrc: require("../assets/icon/forestfire.png"), name: "Fire" },
@@ -47,19 +48,21 @@ export default {
 
   data() {
     return {
-      checkAll: false,
-      checkedTypes: [],
-      Types: TypeOptions,
+      checkAll: false,//是否全选中
+      checkedTypes: [],//记录选中的种类
+      Types: TypeOptions,//灾害种类与图标
       isIndeterminate: true,
     };
   },
   methods: {
+    //是否全选按钮改变
     handleCheckAllChange(val) {
       this.checkedTypes = val ? this.Types : [];
       //console.log(this.checkedTypes);
       this.isIndeterminate = false;
       this.$emit("filterSelection", this.checkedTypes);
     },
+    //灾害选择改变
     handleCheckedTypesChange(value) {
       let checkedCount = value.length;
 
